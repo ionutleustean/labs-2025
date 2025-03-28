@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>lab_01_01</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="../src/style.css">
+</head>
+<body>
+<textarea id="source">
+
+class: center, middle, inverse
+
+# Web development
+Welcome!
+
+
+---
+
+# Architecture
+
+.img[![Right-aligned image](./cs.jpg)]
+
+
+---
+
+
+class: inverse
+# Client / Frontend / UI
+.left-column[
+    <ul>
+    <li> <strong> HTML: </strong> 1991 </li>
+    <li> <strong> CSS: </strong> 1994 </li>
+    <li> <strong> JS (Mocha, LiveScript, JavaScript):  </strong> 1995 </li>
+    </ul>
+]
+.right-column[
+    <div>
+    <ul>
+        <li> <strong> node.js: </strong> 2009 </li>
+        <li> <strong> NPM: </strong> 2010 </li>
+    </ul>
+    <p class="small"> 2019: 1 000 000 </h6>
+    <p class="small"> 2022: ~2 100 000 </h6>
+    <div>
+
+    ]
+
+
+---
+
+# JavaScript
+
+.left-column[
+    ```html
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>lab_01_01</title>
+        <meta charset="utf-8">
+        <link rel="stylesheet"
+    href="../src/style.css">
+    </head>
+    <body>
+    </body>
+</html>
+    ```
+]
+
+.right-column[
+
+### How to run JavaScript in HTML?
+```html
+<script src="./script.js">
+</script>
+    ```
+```html
+<script>
+   console.log("Hello, World!");
+</script>
+```
+]
+
+
+
+---
+
+#JavaScript
+
+
+
+<div class="mt"> .red.bold[*Ex.1.1:] Create an HTML page that meets the following requirements:</div>
+<div class="small">
+1. Add an **inline script** in the HTML file that logs the text **inline** to the console.
+2. Create an external file named **`file1.js`** that:
+   - Logs the text `file 1` to the console
+   - Declares a global variable `a` with the value `5`
+
+3. Create another external file named **`file2.js`** that:
+   - Logs the text `file 2 5` to the console
+     (Use the variable `a` declared in `file1.js`)
+
+4. Include all three scripts in the HTML file in the following order:
+   - the inline script
+   - `file1.js`
+   - `file2.js`
+</div>
+<strong>Inspecteaza ce se afiseaza in consola browser-ului.</strong>
+
+<strong>Ce se întâmplă dacă incluzi `file2.js` **înainte** de `file1.js`?
+ </strong>
+
+.footnote[.red.bold[*] ` console.log(); ` `var a;` ]
+
+---
+## Similarities with Other Languages
+.small[
+.left-column[
+    ```javascript
+const score = 85;
+
+if (score >= 90) {
+  console.log("Grade: A");
+} else if (score >= 80) {
+  console.log("Grade: B");
+} else {
+  console.log("Grade: C or below");
+}```
+
+<br>
+```javascript
+for (let i = 0; i < 5; i++) {
+  console.log("Iteration number:", i);
+}```
+]
+
+.right-column[
+```javascript
+const day = "Tuesday";
+switch (day) {
+  case "Monday":
+    console.log("Start of the work week.");
+    break;
+  case "Tuesday":
+    console.log("Second day of the work week.");
+    break;
+  case "Friday":
+    console.log("Last day of the work week!");
+    break;
+  default:
+    console.log("Midweek or weekend day.");
+}```
+
+<br>
+
+```javascript
+let count = 0;
+while (count < 3) {
+  console.log("Count is:", count);
+  count++;
+}```
+]]
+
+---
+
+class: middle center inverse
+#Particularities of the Language
+---
+
+### 🔧 Functions in JavaScript
+Function Declaration
+```javascript
+function greet(name) {
+  console.log("Hello, " + name + "!");
+}
+
+greet("Alice"); // Output: Hello, Alice!
+```
+
+
+Function Expression
+```javascript
+const greet = function(name) {
+  console.log("Hello, " + name + "!");
+};
+
+greet("Bob");
+```
+
+---
+## ➡️ Arrow Functions in JavaScript (ES6+)
+
+Arrow functions provide a **shorter syntax** for writing functions. They're especially useful for **inline** and **callback** functions.
+
+.small[.left-column[
+### ✅ Basic Syntax
+
+```javascript
+const add = (a, b) => {
+  return a + b;
+};
+
+// Shorter form w
+const add = (a, b) => a + b;
+const double = a => a  * 2;
+```
+
+
+.important[### 📝 Summary:
+- Short, clean syntax
+- Useful for callbacks
+- Do **not** bind their own `this`, `arguments`, or `super`
+- Not suitable as constructors
+]]]
+
+
+---
+
+.small[.left-column[
+### ❗Regular functions  **do have their own `this`**.
+
+```javascript
+function Timer() {
+  this.seconds = 0;
+
+  setInterval(function() {
+    this.seconds++;
+    console.log(this.seconds);
+  }, 1000);
+}
+```
+]]
+.small[.right-column[
+### ❗Arrow functions **do not have their own `this`**.
+They inherit `this` from the **surrounding (lexical) scope**.
+
+```javascript
+function Timer() {
+  this.seconds = 0;
+
+  setInterval(() => {
+    this.seconds++;
+    console.log(this.seconds);
+  }, 1000);
+}
+```
+
+
+]]
+
+<br>
+.clear[
+    > Using `function()` instead of an arrow function in the example above would result in a different `this` — pointing to the global object or `undefined` (in strict mode).
+]
+
+---
+
+### 🧠 Lexical Scope (a.k.a. Static Scope)
+<ul class="small">
+ <li> Variables are accessible <strong> based on where they are declared in the source code </strong> .  </li>
+ <li> Inner functions have access to variables from their  <strong> outer (parent) scopes </strong> . </li>
+ <li>Scope is determined at  <strong> compile time </strong> , not runtime. </li>
+</ul>
+
+<strong class="mt"> ✅ Example: </strong>
+
+.left-column[
+```javascript
+function outer() {
+  const x = 10;
+
+  function inner() {
+    console.log(x); // ✅ Can access x
+  }
+
+  inner();
+}
+
+outer();
+    ```
+]
+.right-column[
+``` javascript
+function inner() {
+  console.log(x); // ❌ Error: x is not defined
+}
+
+function outer() {
+  const x = 10;
+  inner();
+}
+
+outer();
+```
+]
+
+---
+
+ ## 🧱 Block Scope in JavaScript
+
+- Variables declared with `let` and `const` are **block-scoped**.
+- A **block** is any code wrapped in `{ }`, such as in `if`, `for`, or standalone.
+- Variables declared with `var` **do not** have block scope — they are function-scoped.
+
+
+### ✅ Example:
+.left-column[
+```javascript
+{
+  let a = 10;
+  const b = 20;
+  console.log(a, b); // ✅ Works
+}
+
+console.log(a, b); // ❌ ReferenceError: a is not defined
+```
+]
+
+.right-column[
+```javascript
+    {
+  var x = 100;
+}
+console.log(x); // ✅ 100 (still accessible!)
+```
+]
+
+.right-column[
+```javascript
+Block scoping prevents
+accidental variable leaks
+and makes code more predictable.
+```]
+
+<div class="clear">
+.footnote[.red.bold[*] `var` is evil! ]
+</div>
+
+
+---
+
+class: middle  center inverse
+
+### Nailing Your JS Interview
+
+---
+## 🎈 Hoisting in JavaScript
+
+.small[**Hoisting** is JavaScript's behavior of moving **variable and function declarations** to the **top of their scope** before code execution.]
+
+.left-column[.small[
+ ✅ Function Declaration Hoisting
+
+```javascript
+sayHi(); // ✅ Works
+
+function sayHi() {
+  console.log("Hello!");
+}
+```
+
+ ⚠️ `var` Hoisting
+
+```javascript
+console.log(a); // ✅ undefined (not ReferenceError)
+var a = 5;
+```
+> The declaration `var a;` is hoisted, but the assignment `a = 5;` is **not**.
+
+
+
+
+
+❌ `let` / `const` .red[//ReferenceError]
+ > `let` and `const` are hoisted, but you **can’t use them** before the declaration line.
+
+
+
+
+
+]]
+
+
+.right-column[.small[
+  ### 🔍 Summary Table
+
+| Keyword   | Hoisted | Initialized | Usable Before Declaration |
+|-----------|---------|-------------|----------------------------|
+| `var`     | ✅ Yes  | ❌ No        | ⚠️ Yes (as `undefined`)   |
+| `let`     | ✅ Yes  | ❌ No        | ❌ No (TDZ error)          |
+| `const`   | ✅ Yes  | ❌ No        | ❌ No (TDZ error)          |
+| Function  | ✅ Yes  | ✅ Yes       | ✅ Yes                     |
+
+---
+.important[
+### 📝 Tip:
+
+To avoid confusion, **always declare variables at the top of their scope** and **initialize them before use**.
+]]]
+
+
+
+
+---
+### 🧠 Event Loop ( JavaScript is **single-threaded**)
+.small[
+** 1. Code Runs in the `Call Stack` (Synchronous Code)**
+
+- The **call stack** is where synchronous functions are executed.
+- Each function call is added to the top of the stack and removed when it finishes.
+
+```js
+function sayHi() {
+  console.log('Hi!');
+}
+sayHi(); // Goes on the stack, executes, then is removed
+```
+
+
+
+** 2. Async Operations Go to the `Web APIs`**
+
+- When asynchronous code (like `setTimeout`, `fetch`, or `DOM events`) is encountered, it is **handled outside** the call stack by browser-provided **Web APIs**.
+- These APIs set timers or wait for events without blocking the main thread.
+
+```js
+setTimeout(() => {
+  console.log('I run later');
+}, 1000);
+```
+
+
+
+** 3. Callbacks Enter the `Callback Queue`**
+
+- When the async task completes (e.g. the timer expires), its callback is added to the **callback queue** (also known as the **task queue**).
+
+
+**4. The `Event Loop` Coordinates Everything**
+
+- The **event loop** constantly checks if the **call stack is empty**.
+- If it is, it **pushes the next callback** from the queue onto the stack to run.
+- This ensures asynchronous tasks run **only when the stack is clear**.
+
+]
+
+---
+### 🧠 Event Loop visual Overview
+
+
+```text
+
+
+
+┌────────────────────────────┐
+│        JavaScript          │
+│         Runtime            │ ─────────────────────────┐
+└────────────────────────────┘                          │
+            │                                           │
+            ▼                                           ▼
+┌────────────────────────────┐       ┌────────────────────────────────┐
+│        Call Stack          │       │    Web API                     │
+│                            │       │       DOM | AJAX | setTimeout  │
+│  Executes synchronous code │       │       HTTP Requests            │
+└────────────────────────────┘       └────────────────────────────────┘
+            ▲                                           │
+            │                                           │
+            ▼                                           ▼
+┌────────────────────────────┐       ┌────────────────────────────────┐
+│        Event Loop          │       │    Callback Queue              │
+│  Checks if call stack is   │◄─────►│       - Microtasks (promises)  │
+│  empty and pulls tasks     │       │       - Macrotasks (timers)    │
+└────────────────────────────┘       └────────────────────────────────┘
+```
+
+
+
+---
+### 🔁 Event Bubbling
+
+.small[
+An event triggered on a child element **bubbles up** to its ancestors (parent, grandparent, etc.). Allowing parent elements to react to events fired on their children.
+
+.left-column[
+** 📌 Example HTML **
+
+```html
+<div id="parent">
+  <button id="child">click</button>
+</div>
+```
+]
+
+.right-column[
+** 📌 JavaScript **
+
+```javascript
+document.getElementById("child")
+    .addEventListener("click", () => {
+   console.log("Child clicked");
+});
+```
+```javascript
+document.getElementById("parent")
+    .addEventListener("click", () => {
+   console.log("Parent clicked");
+});
+
+```
+]
+
+.clear[
+**🔧 Stopping Bubbling**
+
+```javascript
+document.getElementById("child").addEventListener("click", (event) => {
+  event.stopPropagation();
+});
+```
+
+Now clicking the button **won't trigger** the parent's event listener.
+]
+
+
+
+.clear[
+.important[
+** 📝 Tip: **
+Use bubbling to implement **event delegation**, where one handler manages events for multiple child elements.
+
+]]]
+
+---
+
+### 🏷️ Classes
+.small[
+JavaScript classes provide a **blueprint** for creating objects with shared structure and behavior (methods).
+They were introduced in **ES6** as syntactic sugar over prototypes.
+
+
+### ✅ Class Declaration
+
+```javascript
+class Person {
+  constructor(name, age) {
+    this.name = name;
+    this.age = age;
+  }
+
+  greet() {
+    console.log(`Hello, my name is ${this.name}.`);
+  }
+}
+
+const alice = new Person("Alice", 30);
+alice.greet(); // Output: Hello, my name is Alice.
+```
+
+
+
+### 📝 Summary
+
+- Use `class` to define object templates
+- `constructor` is called when creating an instance
+- Use `extends` for inheritance
+- Use `super()` to call the parent constructor or methods
+- Under the hood, classes still use **prototypes**
+- .red[**No `interface` or `abstract class` support**]
+
+]
+---
+
+class: middle center inverse
+
+# Live Coding
+
+---
+# JavaScript
+
+<div class="mt"> .red.bold[*Ex.1.2:] Extend the Current Code:</div>
+
+Add **4 HTML elements**, each with a **different color**.
+
+For each element:
+- Attach an **event handler** that updates the **current drawing color** when the element is clicked.
+
+Finally:
+- **Test** if the drawing color changes correctly when clicking each element.
+
+
+
+    </textarea>
+<script src="../src/remark-latest.min.js">
+</script>
+<script>
+    var slideshow = remark.create();
+</script>
+</body>
+</html>

@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>lab_01_01</title>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="../src/style.css">
+    </head>
+    <body>
+    <textarea id="source">
+
+class: center, middle, inverse
+
+# Typescript
+
+---
+
+class: middle
+## 📘 TypeScript Essentials
+
+TypeScript is a **typed superset of JavaScript** that compiles to plain JavaScript. It adds **static typing**, **interfaces**, **enums**, and **modern language features**.
+
+---
+
+## ✅ Why Use TypeScript?
+- Catches errors at **compile time**
+- Provides **better tooling** (auto-complete, refactoring)
+- Supports **modern JavaScript features**
+- Encourages **clean architecture** and **code maintainability**
+
+---
+
+## 📦 Getting Started
+
+```bash
+npm install -g typescript
+```
+
+```bash
+tsc --init    # Create tsconfig.json
+tsc file.ts   # Compile a TS file to JS
+```
+
+---
+
+## ✍️ Basic Types
+
+```typescript
+let isDone: boolean = false;
+let age: number = 42;
+let name: string = "Alice";
+let list: number[] = [1, 2, 3];
+let tuple: [string, number] = ["hello", 10];
+```
+
+---
+
+## 🧱 Interfaces & Types
+
+```typescript
+interface Person {
+  name: string;
+  age: number;
+}
+
+const user: Person = {
+  name: "John",
+  age: 30
+};
+```
+
+```typescript
+type ID = string | number;
+const uuid: ID = "123";
+
+```
+
+---
+
+
+## 🎯 Functions with Types
+
+```typescript
+function add(a: number, b: number): number {
+  return a + b;
+}
+
+const greet = (name: string): void => {
+  console.log(`Hello, ${name}`);
+};
+```
+
+---
+
+## 📦 Abstract Classes
+
+.small[
+```typescript
+abstract class Animal {
+  constructor(public name: string) {}
+
+  abstract makeSound(): void;
+
+  move(): void {
+    console.log(`${this.name} moves forward.`);
+  }
+}
+
+class Dog extends Animal {
+  makeSound(): void {
+    console.log("Woof!");
+  }
+}
+
+const dog = new Dog("Buddy");
+dog.makeSound(); // Woof!
+dog.move();      // Buddy moves forward
+
+const a = new Animal("X"); // ❌ Error: Cannot create an instance of an abstract class.
+```
+** 📝 Key Points **
+
+- Use `abstract` keyword for both class and methods
+- Subclasses **must implement** abstract methods
+- Abstract classes can contain both abstract and concrete methods
+
+    ]
+---
+
+## 🧰 Generics
+.small[
+
+.left-column[
+```typescript
+class Box<T> {
+  private _value: T;
+
+  constructor(value: T) {
+    this._value = value;
+  }
+
+  getValue(): T {
+    return this._value;
+  }
+
+  setValue(value: T): void {
+    this._value = value;
+  }
+}
+```
+]
+.right-column[
+```typescript
+function identity<T>(arg: T): T {
+  return arg;
+}
+
+let output = identity<string>("hello");
+```
+]]
+---
+
+## 🔐 Access Modifiers
+
+- `public`: accessible from anywhere (default)
+- `private`: accessible only within the class
+- `protected`: accessible within the class and subclasses
+
+---
+
+## ⛓️ Type Narrowing
+
+```typescript
+function printId(id: string | number) {
+  if (typeof id === "string") {
+    console.log(id.toUpperCase());
+  } else {
+    console.log(id);
+  }
+}
+```
+---
+## 🤔 `any` vs `unknown` in TypeScript
+.small[
+Both `any` and `unknown` are top types that can hold **any value**, but they are used very differently.
+
+
+.left-column[
+### 🔥 `any`
+
+- Disables type checking.
+- Use it when you're migrating from JavaScript or when type is truly dynamic.
+- Avoid overuse – it defeats the purpose of TypeScript.
+
+```typescript
+let value: any = "hello";
+value = 42;
+value = true;
+
+// No error – unsafe
+value.toUpperCase();
+```
+
+> `any` bypasses the type system entirely – TypeScript won't warn you about unsafe operations.
+]
+.right-column[
+### 🛡️ `unknown`
+- Safer alternative to `any`
+- Can still hold any value, **but you must narrow its type** before using it
+
+
+```typescript
+    let value: unknown = "hello";
+    value = 42;
+    value = true;
+
+    // Error – type must be
+    // checked first
+    value.toUpperCase(); // ❌ error
+
+    if (typeof value === "string") {
+      console.log(value.toUpperCase());
+        // ✅ Safe
+    }
+```
+]]
+
+.clear[.important[.red[
+    ### Do not use `any`
+]]]
+---
+
+## 🧠 Type Assertions
+.small[
+```typescript
+const input = document.getElementById("myInput") as HTMLInputElement;
+console.log(input.value);
+```
+
+```typescript
+let strLength: number = (<string>someValue).length;
+```
+.important[
+⚠️
+**Type assertions do not change the runtime type**
+
+They’re just a way to help TypeScript understand your intent.
+
+
+Only use them when you're sure of the type.
+]
+###🧠 Double Assertions (use sparingly!)
+```typescript
+const val = "hello" as unknown as number;
+```
+
+
+        ]
+---
+
+## 🧾 Utility Types
+
+- `Partial<T>` – makes all properties optional
+- `Readonly<T>` – makes all properties readonly
+- `Record<K, T>` – constructs an object type
+- `Pick<T, K>` – selects a set of properties
+- `Omit<T, K>` – excludes a set of properties
+
+---
+
+## 🧱 Modules & Imports
+
+```typescript
+// file1.ts
+export const pi = 3.14;
+
+// file2.ts
+import { pi } from "./file1";
+```
+
+---
+
+## 🔍 tsconfig.json Tips
+
+.small[
+
+```json
+{
+  "compilerOptions": {
+    "target": "ES6",                    // Compile code to ES6 syntax
+    "module": "ES6",                    // Use ES module system (import/export)
+    "strict": true,                     // Enable strict type-checking
+    "esModuleInterop": true,            // Ensure compatibility between CommonJS and ES
+                                           modules
+    "outDir": "./dist"                  // Output compiled files to the 'dist' folder
+  },
+  "include": ["src/**/*"]               // Include all files in the 'src' folder
+}
+        ```
+        ]
+
+
+
+---
+
+## 📝 Summary
+
+| Feature         | JavaScript | TypeScript |
+|----------------|------------|------------|
+| Static Typing   | ❌          | ✅          |
+| Interfaces      | ❌          | ✅          |
+| Enums           | ❌          | ✅          |
+| Compile-time Errors | ❌     | ✅          |
+| Tooling Support | ✅ (basic) | ✅✅✅        |
+
+> TypeScript helps you write **robust**, **scalable**, and **maintainable** code.
+
+---
+class: center,    middle, inverse
+
+# Live Coding
+---
+## Typescript
+
+<div class="mt"> .red.bold[*Ex.1.3:] Write a function that receives an instance of a class (Animal, Person, or Application) and executes its run() method.</div>
+
+.small[
+
+.left-column[
+```typescript
+class Animal {
+   ...
+   run(): void {
+     console.log(`Run as an animal`);
+   }
+   ...
+}
+
+class Person {
+   ...
+   run(): void {
+     console.log(`Runs as a person`);
+   }
+   ...
+}
+
+class Application {
+    ...
+    run(): void {
+        console.log(`Runs the application`);
+    }
+}
+```
+
+]
+
+.right-column[
+
+`executeRun(new Animal());`       // Output: Runs as an animal
+
+`executeRun(new Person());`       // Output: Runs as a person
+
+`executeRun(new Application());`  // Output: Runs the application
+
+]
+]
+    </textarea>
+    <script src="../src/remark-latest.min.js">
+    </script>
+    <script>
+        var slideshow = remark.create();
+    </script>
+    </body>
+</html>
