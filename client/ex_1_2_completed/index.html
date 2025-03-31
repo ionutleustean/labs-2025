@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body style="background: #353434">
+<div id="canvas"></div>
+
+<div class="menu">
+    <div class="item red" onclick="changeColor('red')"> </div>
+    <div class="item blue" onclick="changeColor('blue')"> </div>
+    <div class="item green" onclick="changeColor('green')"> </div>
+    <div class="item yellow" onclick="changeColor('yellow')"> </div>
+</div>
+
+</body>
+<style>
+    #canvas {
+        width: 1000px;
+        height: 700px;
+        background: #e6e6e6;
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .menu{
+        height: 50px;
+        width: 100%;
+        background: #e6e6e6;
+        margin-top: 10px;
+        display: flex;
+        flex-direction: row;
+
+        .item {
+            height: 50px;
+            width: 50px;
+            cursor: pointer;
+        }
+
+        .red {
+            background: red;
+        }
+
+        .blue {
+            background: blue;
+        }
+
+        .green {
+            background: green;
+        }
+
+        .yellow {
+            background: yellow;
+        }
+    }
+
+</style>
+
+<script src="script.js"></script>
+</html>
