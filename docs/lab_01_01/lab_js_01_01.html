@@ -10,6 +10,15 @@
 
 class: center, middle, inverse
 
+# Ionut Leustean
+https://github.com/ionutleustean/labs-2025.git
+
+
+.left[.footnote[.red[*] Wi-Fi: IRIAN@TM-5G; Password: irian@office@tm ]]
+
+---
+class: center, middle, inverse
+
 # Web development
 Welcome!
 
@@ -214,7 +223,16 @@ const double = a => a  * 2;
 
 
 ---
+class: middle center inverse
 
+Javascript makes me want to flip
+
+the table and say **"Fuck this shit"**, but
+
+I can never be sure what **"this"** refers to.
+
+
+---
 .small[.left-column[
 ### ❗Regular functions  **do have their own `this`**.
 
@@ -223,7 +241,6 @@ function Timer() {
   this.seconds = 0;
 
   setInterval(function() {
-    this.seconds++;
     console.log(this.seconds);
   }, 1000);
 }
@@ -238,7 +255,6 @@ function Timer() {
   this.seconds = 0;
 
   setInterval(() => {
-    this.seconds++;
     console.log(this.seconds);
   }, 1000);
 }
