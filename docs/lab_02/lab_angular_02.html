@@ -364,7 +364,100 @@ Att the bottom add 3 buttons that will update the index value
 
 
 ---
-## Change detection
+## ⚙️ Change Detection Strategies
+.small[
+Angular updates the DOM when app state changes. This process is called **Change Detection**.
+- Angular checks **components and their templates** for changes.
+- Triggered by:
+  - Events (click, input, etc.)
+  - Async tasks (setTimeout, HTTP, etc.)
+  - Manual triggers (e.g. `ChangeDetectorRef`)
+
+.left-column[
+### 🔁 Default Strategy
+
+```ts
+@Component({
+  changeDetection: ChangeDetectionStrategy.Default
+})
+```
+
+- Checks the entire component tree.
+- Updates whenever Angular thinks something *might* have changed.
+
+]
+.right-column[
+### 🚀 OnPush Strategy
+
+```ts
+@Component({
+  changeDetection: ChangeDetectionStrategy.OnPush
+})
+```
+
+- Only checks when:
+  - Input reference changes
+  - You trigger it manually (e.g., with `markForCheck()`)
+
+- Boosts performance, especially with large trees or heavy templates.
+
+]
+
+.clear[
+## ✅ Summary
+
+| Strategy   | When to Use                        |
+|------------|------------------------------------|
+| `Default`  | Simpler logic, smaller apps        |
+| `OnPush`   | High-performance, predictable data |
+
+.important[    💡 Tip: Use `OnPush` with **immutable data** and **Observables** for best results!]
+
+
+]
+
+
+]
+
+---
+## 🧠 Angular Signals & Change Detection
+.small[
+**Signals** provide fine-grained reactivity in Angular by tracking dependencies explicitly.
+Instead of relying on zone-based dirty checking, **Signals update only the parts of the UI that depend on them**.
+
+### 🔁 How It Works
+
+- `signal()` creates reactive state
+- Any `template` depending on a signal auto-updates when the signal changes
+- No need to manually trigger change detection or use `ChangeDetectorRef`
+
+### 📦 Example
+
+```typescript
+import { signal } from '@angular/core';
+
+export class CounterComponent {
+  count = signal(0);
+
+  setCount(newValue: number) {
+    this.count.set(newValue);
+  }
+
+  updateCount() {
+    this.count.update(value => value + 1);
+  }
+}
+    ```
+]
+---
+
+class: center,  middle,inverse
+# Live code
+
+---
+
+branch: ex_2_4
+.red.bold[*Ex.2.4:] Add change detection On Push; And refactor the header to use signals;
 
 
 
