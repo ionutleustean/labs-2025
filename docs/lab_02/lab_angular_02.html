@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>lab_01_01</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="../src/style.css">
+</head>
+<body>
+<textarea id="source">
+
+class: center, middle, inverse
+
+# Angular
+
+---
+## MVC Architecture
+
+
+    ┌───────────────────┐     Input / Events  ┌───────────────────┐ Updates  ┌─────────────────┐
+    │       View        │────────────────────►│    Controller     │─────────►│     Model       │
+    │    (UI Layer)     │                     │  (Input Handler)  │          │ (Data + Logic)  │
+    └───────────────────┘                     └───────────────────┘          └─────────────────┘
+               ▲                                   │        ▲                           │
+               │                                   │        │                           │
+               │    Change Notification            │        │                           │
+               └───────────────────────────────────┘        └───────────────────────────┘
+
+### Summary
+
+Angular mainly covers the **View** and **Controller** parts of the MVC pattern:
+- Components act as controllers (Components).
+- Templates serve as views (HTML).
+- Services and models handle the business logic and data layer.
+
+---
+## Angular CLI
+
+.small[.left-column[
+    ## ✅ What Angular CLI Does
+
+- 🔧 **Scaffolding**:
+  - `ng new`: Create a new Angular project.
+  - `ng generate component|service|module`: Generate boilerplate code.
+
+- 🚀 **Development Server**:
+  - `ng serve`: Run a local dev server with live reload.
+
+- 🧪 **Testing**:
+  - `ng test`: Run unit tests with Karma.
+  - `ng e2e`: Run end-to-end tests.
+
+- 🛠️ **Build & Optimization**:
+  - `ng build`: Build the project for production or development.
+  - Includes AOT (Ahead-of-Time) compilation, tree shaking, lazy loading.
+
+- 🌍 **Internationalization (i18n)**:
+  - Extract and manage translation files.
+
+    ]]
+
+.right-column[
+```shell
+> npm install -g @angular/cli
+> ng new PizzaApp
+> cd PizzaApp
+> ng serve
+```
+
+```shell
+ng new angular-apps --no-create-application
+ng generate application app1
+
+```
+    ]
+
+---
+
+## App configuration
+
+
+```typescript
+import { ApplicationConfig } from '@angular/core';
+import { provideRouter } from '@angular/router';
+import { routes } from './app.routes';
+
+    export const appConfig: ApplicationConfig = {
+    providers: [provideRouter(routes)]
+};
+```
+
+ApplicationConfig - Set of config options available during the application bootstrap operation
+
+provideRouter - Sets up providers necessary to enable Router functionality for the application.
+
+---
+## Components
+
+An Angular component is the **building block** of the UI.
+
+.small[.left-column[
+```ts
+@Component({
+  selector: 'app-example',
+  templateUrl: './example.component.html',
+  styleUrls: ['./example.component.scss'],
+  standalone: true,
+  imports: [CommonModule]
+})
+export class ExampleComponent {
+  title = 'Hello Angular';
+
+  onClick() {
+    console.log('Clicked!');
+  }
+}
+```
+
+]
+
+
+.right-column[
+
+```
+example/
+├── example.component.ts     // Component class
+├── example.component.html   // Template (View)
+├── example.component.scss   // Styles
+```
+]]
+
+.clear[
+**Template (HTML)** + **Styles (CSS/SCSS)** + **Logic (TypeScript)** + **Metadata => `@Component`**
+]
+
+---
+## Styling
+
+Angular allows you to style your application using both **global styles** and **component-level styles**.
+.small[
+
+.left-column[
+### 🌐 Global Styles
+
+Defined in `styles.css` or `styles.scss` (configured in `angular.json`).
+]
+.right-column[
+
+### 🧩 Component-Level Styles
+
+Defined in each component’s `.scss` / `.css` file or inline with the `styles` property.
+
+]
+
+.clear[
+ ## ⚙️ View Encapsulation Modes
+
+| Mode              | Description                                           |
+|-------------------|-------------------------------------------------------|
+| Emulated (default)| Styles are scoped using generated attribute selectors |
+| None              | Styles are global                                     |
+| ShadowDom         | Uses native Shadow DOM for true encapsulation         |
+
+```ts
+@Component({
+  encapsulation: ViewEncapsulation.None // or .ShadowDom or default
+})
+```
+
+
+### Add bootstrap
+
+```shell
+npm install bootstrap@5.3.3
+
+```
+
+Add to app
+
+https://getbootstrap.com/docs/5.3/customize/sass/
+
+]]
+---
+.red.bold[*Ex.2.1:] Create an workspace with angular named "angular-apps";
+
+Generate an app named 'ex_2_1'
+
+Test if works;
+
+Add bootstrap to the project;
+
+Add a button with specific bootstrap class to test if bootstrap is working;
+
+---
+
+.left-column[
+### 🧱 Generating an Angular Component
+.small[
+```bash
+ng generate component my-component
+# or shorthand
+ng g c my-component
+```
+
+This creates:
+- `my-component.component.ts` – Logic
+- `my-component.component.html` – Template
+- `my-component.component.css` – Styles
+- Adds the component to your module automatically
+
+Use it in your template:
+
+```html
+<app-my-component></app-my-component>
+```
+]
+]
+.right-column[
+### 📐 Using the Bootstrap Grid System
+.small[
+Bootstrap uses a **12-column flexbox grid**. Basic structure:
+
+```html
+<div class="container">
+  <div class="row">
+    <div class="col-md-6">Left</div>
+    <div class="col-md-6">Right</div>
+  </div>
+</div>
+```
+
+### Key classes:
+- `container` – Adds padding and centers content
+- `row` – Defines a flex row
+- `col`, `col-6`, `col-md-4` – Defines column widths
+
+### Responsive examples:
+- `col-sm-*` – Small screens
+- `col-md-*` – Medium screens
+- `col-lg-*` – Large screens
+
+📌 Tip: Combine columns to make 12 total per row.
+]]
+
+---
+class: center, middle,inverse
+
+# Live Coding
+
+---
+.red.bold[*Ex.2.2:] Using the bootstrap grid system create and populate a footer for this page. The footer should contain the following elements:
+
+    One column that is 8/12 of the width of the page and contains an "About us" section.
+    One column that is 4/12 of the width of the page and contains a small list of links;
+
+https://getbootstrap.com/docs/5.3/layout/grid/
+
+---
+## 🔗 Data Binding in Angular
+.small[
+.left-column[
+### 🟢 One-Way Binding (Property Binding)
+
+```html
+<input [value]="username" />
+```
+- Data flows **from component → view**
+
+
+
+### ✨ Interpolation
+
+```html
+<p>Hello, {{ username }}!</p>
+```
+- Inserts **component data** into the DOM
+
+]
+.right-column[
+### 🖱️ Event Binding
+
+```html
+<button (click)="onClick()">Click Me</button>
+```
+- Listens to **DOM events** and calls component methods
+
+### ✏️ Two-Way Binding (banana in a box)
+
+### Using `[(ngModel)]`
+```html
+<input [(ngModel)]="username" />
+<input [ngModel]="username"
+    (ngModelChange)="username = $event"/>
+```
+- Data flows **both ways**
+- Requires `FormsModule` to be imported
+]]
+.clear[
+✅ Summary:
+- `{{ }}` – Interpolation
+- `[property]` – One-way (Component → View)
+- `(event)` – One-way (View → Component)
+- `[(ngModel)]` – Two-way (Component ⬌ View)
+]
+---
+.small[
+.left-column[
+## ✅ `@if` – Conditional Rendering
+
+
+```html
+@if (user.isLoggedIn) {
+  <p>Welcome back, {{ user.name }}!</p>
+} @else if (user.isGuest) {
+  <p> Welcome, guest!</p>
+} @else {
+  <p>Please log in.</p>
+}
+```
+- Cleaner block-based syntax
+- Supports `@else` and nested logic
+]
+
+.right-column[
+## 🔃 `@switch` – Multiple Conditions
+
+```html
+@switch (status) {
+  @case ('loading') {
+    <p>Loading...</p>
+  }
+  @case ('success') {
+    <p>Data loaded successfully!</p>
+  }
+  @case ('error') {
+    <p>Oops! Something went wrong.</p>
+  }
+  @default {
+    <p>Unknown status</p>
+  }
+}
+```
+- Great for enums and state-based rendering
+]]
+
+.clear[
+### 📌 Summary
+
+- `@if` and `@switch` offer **more readable**, **structured templates**
+- Available in **Angular 17+**
+- Must be enabled via the `"controlFlow": true` flag in `tsconfig.json` (if not on by default)
+]
+---
+
+branch: ex_2_3
+.red.bold[*Ex.2.3:]  **Slideshow** : Using data binding, replace the hardcoded description of the slide with the data provided by the component;
+Create 2 additional slides for header2 and header3 variables;
+
+Define a new variable `index` that will be used to control the current slide;
+
+Using control flow display the current slide based on the value of `index` variable;
+
+Att the bottom add 3 buttons that will update the index value
+
+
+
+---
+## Change detection
+
+
+
+    </textarea>
+<script src="../src/remark-latest.min.js">
+</script>
+<script>
+    var slideshow = remark.create({
+        ratio: '16:9'
+    });
+</script>
+</body>
+</html>
