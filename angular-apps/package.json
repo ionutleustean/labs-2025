@@ -5,6 +5,7 @@
     "ng": "ng",
     "start": "ng serve",
     "start_lab_1": "ng serve lab_1 --port=4201",
+    "start_lab_2_2": "ng serve lab_2_2 --port=4202",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"

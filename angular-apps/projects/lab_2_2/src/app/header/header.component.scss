@@ -1,0 +1,28 @@
+.slide {
+  flex-grow: 1;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
+  h1 {
+    font-size: 6rem;
+    color: #fff;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    margin-bottom: 20px;
+  }
+
+  p {
+    font-size: 1.5rem;
+    color: #fff;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    margin-bottom: 20px;
+  }
+}
+
+
+#header {
+  display: flex;
+  flex-direction: column;
+}
