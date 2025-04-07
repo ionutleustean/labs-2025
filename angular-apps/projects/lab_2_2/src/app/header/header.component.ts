@@ -7,7 +7,8 @@ import {NgStyle} from '@angular/common';
     NgStyle
   ],
   templateUrl: './header.component.html',
-  styleUrl: './header.component.scss'
+  styleUrl: './header.component.scss',
+  standalone: true
 })
 export class HeaderComponent {
 
