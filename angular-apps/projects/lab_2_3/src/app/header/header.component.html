@@ -1,0 +1,42 @@
+<div id="header" [style.height]="'100vh'">
+  <nav class="navbar navbar-expand-lg sticky-top bg-body-tertiary">
+    <div class="container-fluid space-between">
+      <a class="navbar-brand" href="#">My Pizza</a>
+      <div>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+                aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="#header">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#pizzas">Pizzas</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#add-pizza">Add pizza</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#footer">Footer</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </nav>
+  <div class="slide" [ngStyle]="{'background-image': 'url(bg1.png)'}">
+    <div class="container">
+      <div class="row">
+        <div class="col-12 col-md-6">
+          <h1> Awesome Pizza </h1>
+          <p> Experience the irresistible flavor of Awesome Pizza! Our expertly crafted dough is hand-tossed to
+            perfection
+            and topped with the finest ingredients—rich tomato sauce, melted cheese, and a carefully selected mix of
+            savory toppings. </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
