@@ -460,6 +460,57 @@ branch: ex_2_4
 .red.bold[*Ex.2.4:] Add change detection On Push; And refactor the header to use signals;
 
 
+---
+## @for
+.left-column[
+- A **new control flow syntax** introduced in Angular 17.
+- Better support for block-based templating.
+- `index` – The current index of the loop
+- `first` – `true` if it’s the first item
+- `last` – `true` if it’s the last item
+- **Built-in `tracking` with `track` keyword**
+
+
+```html
+@for (item of items; track item.id) {
+  <div>{{ item.name }}</div>
+}
+```
+]
+
+.right-column[
+
+```html
+@for (
+  item of items;
+  track item.id;
+  index as i;
+  first as isFirst;
+  last as isLast
+) {
+  <div>
+    {{ i }}: {{ item.name }}
+    @if(isFirst) {
+      <span>👑</span>
+    }
+    @if(isLast) {
+      <span>🏁</span>
+    }
+  </div>
+}
+}```
+]
+---
+
+branch: ex_2_5
+.red.bold[*Ex.2.5:] Generate a new component named `feature-pizza-list` inside the `pizza` folder.
+
+- Store the provided data (from the `data` folder) in a **signal**.
+- Use the `@for` directive to render the list of pizzas.
+- Display each pizza using a **Bootstrap card** layout.
+
+
+https://getbootstrap.com/docs/5.3/components/card/
 
     </textarea>
 <script src="../src/remark-latest.min.js">
