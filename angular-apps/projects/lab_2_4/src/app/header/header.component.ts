@@ -32,4 +32,18 @@ export class HeaderComponent {
   setIndex(cIndex: number) {
     this.index = cIndex;
   }
+
+
+  constructor() {
+
+    setInterval(() => {
+      let index = this.index + 1;
+      if(index > 2) {
+        index = 0
+      }
+      this.index = index;
+      console.log(this.index)
+    }, 1000 )
+  }
+
 }
