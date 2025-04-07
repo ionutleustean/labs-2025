@@ -437,7 +437,7 @@ Instead of relying on zone-based dirty checking, **Signals update only the parts
 import { signal } from '@angular/core';
 
 export class CounterComponent {
-  count = signal(0);
+  count = signal<number>(0);
 
   setCount(newValue: number) {
     this.count.set(newValue);
