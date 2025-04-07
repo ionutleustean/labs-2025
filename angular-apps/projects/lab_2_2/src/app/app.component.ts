@@ -6,7 +6,8 @@ import {HeaderComponent} from './header/header.component';
   selector: 'app-root',
   imports: [HeaderComponent],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  styleUrl: './app.component.scss',
+  standalone: true
 })
 export class AppComponent {
   title = 'ex_2_1';
