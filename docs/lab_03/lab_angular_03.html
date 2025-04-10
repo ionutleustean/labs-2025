@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>lab_03</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="../src/style.css">
+</head>
+<body>
+<textarea id="source">
+
+class: center, middle, inverse
+
+# Angular Forms
+
+---
+## How to create a form in html
+
+```html
+<form>
+
+</form>
+
+
+```
+
+---
+
+## How to create a form in html
+
+.left-column[
+```html
+<form
+    action="http://localhost:4200/api/compact-lookup-values"
+    method="post">
+
+  <button type="submit">Submit</button>
+
+</form>
+
+
+```
+]
+
+.right-column[
+```http
+POST http://localhost:4200/api/compact-lookup-values
+Content-Type: application/json
+
+{
+
+}
+
+```
+]
+
+---
+
+## How to create a form in html
+
+.left-column[
+```html
+<form
+    action="http://localhost:4200/api/compact-lookup-values"
+    method="post">
+
+  <input name="firstName" value="Vasile" />
+  <input name="lastName" value="Vasilica" />
+  <input name="age" value="18" />
+
+  <button type="submit">Submit</button>
+
+</form>
+
+
+```
+]
+
+.right-column[
+```http
+POST http://localhost:4200/api/compact-lookup-values
+Content-Type: application/json
+
+{
+    "firstName": "Vasile",
+    "lastName": "Vasilica",
+    "age": 18
+}
+
+```
+]
+
+---
+
+class: center, middle,inverse
+
+# Form in angular
+---
+
+## Form in angular
+
+
+.small[
+.left-column[
+```html
+<form #personForm="ngForm"
+    (ngSubmit)="onSubmit(personForm)">
+
+  <input name="firstName"
+    [ngModel]="person.firstName"
+    (ngModelChanged)="firstNameChanged($event)"/>
+
+  <input name="lastName"
+    [ngModel]="person.lastName"
+    (ngModelChanged)="lastNameChanged($event)"/>
+
+  <input name="age"
+    [ngModel]="person.age"
+    (ngModelChanged)="ageChanged($event)"/>
+
+  <button type="submit">Submit</button>
+
+</form>
+
+
+```
+
+.clear[.important[
+    ####Usually we use this.person() to save the whole object
+]   ]
+]
+
+.right-column[
+```ts
+@Component({
+  selector: 'app-person-form',
+  templateUrl: './person-form.component.html'
+})
+export class PersonFormComponent {
+   person = signal<Person>(new Person());
+
+    firstNameChanged(firstName: string) {
+        this.person.update((prev) => {
+            return {...prev, firstName: firstName};
+        });
+    }
+
+    lastNameChanged(lastName: string) {
+        ...
+    }
+
+    ageChanged(age: number) {
+        ...
+    }
+
+    onSubmit(form: NgForm) {
+        console.log(form.value);
+        // save date to the  server
+        // you can use form.value if only values are needed
+        // or you can use this.person() if you need the whole object
+
+    }
+
+}
+
+```
+]]
+
+---
+
+.red.bold[*Ex.3.1:] In folder pizza create a component called pizza-form.
+
+Create a form with all fields from PizzaModel;
+
+Use bootstrap for input styles
+
+Use **ngSubmit** to print the form values in the console;
+
+
+
+
+
+
+    </textarea>
+<script src="../src/remark-latest.min.js">
+</script>
+<script>
+    var slideshow = remark.create({
+        ratio: '16:9'
+    });
+</script>
+</body>
+</html>
