@@ -175,8 +175,125 @@ Use bootstrap for input styles
 
 Use **ngSubmit** to print the form values in the console;
 
+Don't forget to add the component selector in the app.component.html :)
+
+---
 
 
+## Smart components vs Presentational (Dumb)  components
+**Smart components** are responsible for the business logic of the application. They are responsible for fetching data, handling events, and managing state.
+
+**Presentational (Dumb) components** are responsible for rendering the UI. They receive data from smart components and display it to the user.
+---
+## Smart/Presentational components - data flow
+
+
+                                ┌────────────────────────────┐
+                                │      Smart Component       │
+                                │  (Container / Logic Layer) │
+                                └────────────────────────────┘
+                                          ▲       ▲
+       output() events from               │       │               Data via input()
+       child components                   │       │               emitted to children
+                                          │       │
+           ┌────────────────────────┐     │       │      ┌────────────────────────┐
+           │ Presentational Child A │◄────┘       └─────►│ Presentational Child B │
+           │  (e.g. List Component) │                  │ │ (e.g. Detail / Editor) │
+           └────────────────────────┘                  │ └────────────────────────┘
+                  │                                    │
+     User clicks, selects, etc.                        │
+                  └─────► Event emitted to Smart ◄─────┘
+                          (e.g. "itemSelected", "editRequested")
+
+---
+## input()
+
+**Parent sends data to child**
+
+//parent component.html
+```html
+
+   <app-person [person]="person()"></app-person>
+
+```
+// child component
+```  ts
+
+ @Component({
+    ...
+ })
+ export class ChildComponent{
+    person = input<Person>();
+    ...
+ }
+```
+
+---
+## output()
+
+** Child sends data to parent**
+.small[
+
+.left-column[
+// child component
+```  ts
+
+ @Component({
+    ...
+ })
+ export class ChildComponent{
+    person = output<Person>();
+    ...
+
+    personChanged() {
+        this.person.emit( { ... new data ...});
+    }
+ }
+```
+
+]
+
+.right-column[
+//parent component.html
+```html
+
+   <app-person
+    (person)="updatePerson($event)">
+   </app-person>
+
+```
+
+```typescript
+
+     @Component({
+    ...
+ })
+ export class ParentComponent{
+
+
+    updatePerson(person: Person) {
+        console.log(person);
+        // update the person object
+    }
+
+ }
+```
+
+]]
+---
+.red.bold[*Ex.3.2:] Refactor pizza section to apply smart/presentational components pattern.
+
+Create a new smart component: **pizza-container**
+
+Replace in app.component.html the selector of pizza-form  and feature-pizza-list with pizza-container
+
+Now the pizza-container needs to render the 2 related presentational components;
+
+Move the pizza array from feature-pizza-list  to pizza-container;
+
+Using property binding send pizza list to feature-pizza-list;
+
+Using event binding read data from pizza-form component and update pizza list state
 
 
 
