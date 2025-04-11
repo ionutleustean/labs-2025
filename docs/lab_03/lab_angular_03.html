@@ -295,6 +295,76 @@ Using property binding send pizza list to feature-pizza-list;
 
 Using event binding read data from pizza-form component and update pizza list state
 
+---
+
+## model()
+.small[
+
+.left-column[
+// child component
+```  ts
+
+ @Component({
+    ...
+ })
+ export class ChildComponent{
+    person = model<Person>();
+    ...
+
+    personChanged() {
+        this.person.emit( { ... new data ...});
+    }
+ }
+```
+
+]
+
+.right-column[
+//parent component.html
+```html
+
+   <app-person
+    [person]="person()"
+    (person)="updatePerson($event)">
+   </app-person>
+
+```
+
+```typescript
+
+@Component({
+    ...
+ })
+ export class ParentComponent{
+
+    person = signal<Person>(... old data ...);
+
+    updatePerson(person: Person) {
+        console.log(person);
+        // update the person object
+    }
+
+ }
+```
+
+]]
+
+---
+
+.red.bold[*Ex.3.3:] Edit a pizza from the list.
+
+Add an event handler in pizza list so it emits a pizza when clicked;
+
+In parent component, store the pizza in a signal;
+
+Pass that signal value to pizza-form component;
+
+Refactor pizza-form to use **model** instead of **output**
+
+On Save update that pizza in the list;
+
+
+.footnote[*To be more easy lets add an unique identifier to pizza model and pizza data*;]
 
 
     </textarea>
