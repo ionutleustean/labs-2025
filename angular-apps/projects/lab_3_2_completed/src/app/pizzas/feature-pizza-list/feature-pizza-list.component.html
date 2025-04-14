@@ -1,0 +1,25 @@
+<div id="pizzas" class="container my-5">
+
+  <h2> Pizza List </h2>
+
+  <div class="d-flex flex-row flex-wrap">
+    @for (pizza of pizzas(); track pizza.name) {
+
+      <div class="card m-2" style="width: 300px">
+        <img [src]="pizza.imageUrl"  class="card-img-top" [alt]="pizza.name">
+
+        <div class="card-body">
+          <h5 class="card-title">{{ pizza.name }}</h5>
+          <p class="card-text">{{ pizza.description }}</p>
+          @for (ingredient of pizza.ingredients; track ingredient) {
+            <span class="badge bg-secondary me-1"> {{ ingredient }}</span>
+          }
+          <div>
+            <button class="btn btn-primary mt-3">Edit</button>
+          </div>
+        </div>
+      </div>
+
+    }
+  </div>
+</div>
