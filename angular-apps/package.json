@@ -11,6 +11,7 @@
     "start_lab_2_3_completed" : "ng serve lab_2_3_completed --port=4205",
     "start_lab_2_4" : "ng serve lab_2_4 --port=4206",
     "start_lab_2_5_completed" : "ng serve lab_2_5_completed --port=4208",
+    "start_lab_3_1" : "ng serve lab_3_1 --port=4209",
 
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
