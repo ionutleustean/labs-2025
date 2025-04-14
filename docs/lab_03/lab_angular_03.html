@@ -412,10 +412,10 @@ export class PersonForm {
 
         <input name="firstName" [ngModel]="person.firstName" required  minlength="5" maxlength="45" />
 
-        <div *ngIf="personForm.submitted && personForm.firstName.errors">
-           {{ personForm.firstName.errors.required ? 'First name is required' : '' }}
-           {{ personForm.firstName.errors.minlength ? 'First name is too short' : '' }}
-           {{ personForm.firstName.errors.maxlength ? 'First name is too long' : '' }}
+        <div *ngIf="personForm.submitted && personForm.controls.firstName.errors">
+           {{ personForm.controls.firstName.errors.required ? 'First name is required' : '' }}
+           {{ personForm.controls.firstName.errors.minlength ? 'First name is too short' : '' }}
+           {{ personForm.controls.firstName.errors.maxlength ? 'First name is too long' : '' }}
         </div>
     </form>
 
