@@ -1,0 +1,10 @@
+<app-feature-pizza-list [pizzas]="pizzas()" (pizzaClicked)="onEdit($event)"></app-feature-pizza-list>
+
+<div class="d-flex justify-content-center my-3">
+
+<button type="button" class="btn btn-primary " (click)="addEmptyPizza()" > Add pizza </button>
+</div>
+
+@if (pizza(); as p) {
+  <app-pizza-form [pizza]="p" (pizzaChanged)="onPizzaChanged($event)"></app-pizza-form>
+}
