@@ -107,15 +107,15 @@ class: center, middle,inverse
 
   <input name="firstName"
     [ngModel]="person.firstName"
-    (ngModelChanged)="firstNameChanged($event)"/>
+    (ngModelChange)="firstNameChanged($event)"/>
 
   <input name="lastName"
     [ngModel]="person.lastName"
-    (ngModelChanged)="lastNameChanged($event)"/>
+    (ngModelChange)="lastNameChanged($event)"/>
 
   <input name="age"
     [ngModel]="person.age"
-    (ngModelChanged)="ageChanged($event)"/>
+    (ngModelChange)="ageChanged($event)"/>
 
   <button type="submit">Submit</button>
 
@@ -169,13 +169,10 @@ export class PersonFormComponent {
 
 .red.bold[*Ex.3.1:] In folder pizza create a component called pizza-form.
 
-Create a form with all fields from PizzaModel;
-
-Use bootstrap for input styles
-
-Use **ngSubmit** to print the form values in the console;
-
-Don't forget to add the component selector in the app.component.html :)
+   - Create a form with all fields from PizzaModel;
+   - Use bootstrap for input styles
+   - Use **ngSubmit** to print the form values in the console;
+   - Don't forget to add the component selector in the app.component.html :)
 
 ---
 
@@ -283,17 +280,12 @@ Don't forget to add the component selector in the app.component.html :)
 ---
 .red.bold[*Ex.3.2:] Refactor pizza section to apply smart/presentational components pattern.
 
-Create a new smart component: **pizza-container**
-
-Replace in app.component.html the selector of pizza-form  and feature-pizza-list with pizza-container
-
-Now the pizza-container needs to render the 2 related presentational components;
-
-Move the pizza array from feature-pizza-list  to pizza-container;
-
-Using property binding send pizza list to feature-pizza-list;
-
-Using event binding read data from pizza-form component and update pizza list state
+   - Create a new smart component: **pizza-container**
+   - Replace in app.component.html the selector of pizza-form  and feature-pizza-list with pizza-container
+   - Now the pizza-container needs to render the 2 related presentational components;
+   - Move the pizza array from feature-pizza-list  to pizza-container;
+   - Using property binding send pizza list to feature-pizza-list;
+   - Using event binding read data from pizza-form component and update pizza list state
 
 ---
 
@@ -353,18 +345,116 @@ Using event binding read data from pizza-form component and update pizza list st
 
 .red.bold[*Ex.3.3:] Edit a pizza from the list.
 
-Add an event handler in pizza list so it emits a pizza when clicked;
-
-In parent component, store the pizza in a signal;
-
-Pass that signal value to pizza-form component;
-
-Refactor pizza-form to use **model** instead of **output**
-
-On Save update that pizza in the list;
+   - Add an event handler in pizza list so it emits a pizza when clicked;
+   - In parent component, store the pizza in a signal;
+   - Pass that signal value to pizza-form component;
+   - Refactor pizza-form to use **model** instead of **output**
+   - On Save update that pizza in the list;
 
 
 .footnote[*To be more easy lets add an unique identifier to pizza model and pizza data*;]
+
+---
+
+##Validators
+
+#### Build in validators
+
+
+| `Validators` Method         | Description                          | Template-Driven Directive / Usage                   |
+|----------------------------|--------------------------------------|-----------------------------------------------------|
+| `Validators.required`      | Field must be filled                 | `<input required>`                                  |
+| `Validators.requiredTrue`  | Checkbox must be checked             | `<input type="checkbox" required>`                  |
+| `Validators.email`         | Must be a valid email format         | `<input type="email">`                              |
+| `Validators.minLength(x)`  | Minimum number of characters         | `<input minlength="5">`                             |
+| `Validators.maxLength(x)`  | Maximum number of characters         | `<input maxlength="45">`                            |
+| `Validators.pattern(x)`    | Must match regex pattern             | `<input pattern="[a-zA-Z ]+">`                      |
+| `Validators.min(x)`        | Minimum numeric value                | `<input type="number" min="1">`                     |
+| `Validators.max(x)`        | Maximum numeric value                | `<input type="number" max="10">`                    |
+
+---
+
+### What should happen now?
+
+    1) The form submission is blocked.
+    2) A validation error message will be displayed.
+    3) The problematic field will be visually highlighted.
+
+---
+### 1) The form submission is blocked.
+
+```html
+<form #personForm="ngForm" (ngSubmit)="onSubmit(personForm)">
+....
+</form>
+
+```
+
+```typescript
+
+export class PersonForm {
+    ...
+    ngSubmit(form: NgForm) {
+        if (form.valid) {
+            // submit the form
+        }
+    }
+    ...
+}
+```
+---
+###  2) A validation error message will be displayed.
+
+
+
+```html
+   <form #personForm="ngForm" (ngSubmit)="onSubmit(personForm)">
+
+        <input name="firstName" [ngModel]="person.firstName" required  minlength="5" maxlength="45" />
+
+        <div *ngIf="personForm.submitted && personForm.firstName.errors">
+           {{ personForm.firstName.errors.required ? 'First name is required' : '' }}
+           {{ personForm.firstName.errors.minlength ? 'First name is too short' : '' }}
+           {{ personForm.firstName.errors.maxlength ? 'First name is too long' : '' }}
+        </div>
+    </form>
+
+```
+
+---
+
+### 3) The problematic field will be visually highlighted.
+
+Angular automatically mirrors many control properties onto the form control element as CSS classes. Use these classes to style form control elements according to the state of the form. The following classes are currently supported.
+
+    .ng-valid
+    .ng-invalid
+    .ng-pending
+    .ng-pristine
+    .ng-dirty
+    .ng-untouched
+    .ng-touched
+    .ng-submitted (enclosing form element only)
+
+
+
+### .red[*] in global style we could add:
+```css
+.ng-invalid  {
+    border: 1px solid red;
+}
+```
+
+
+---
+
+.red.bold[*Ex.3.4:] Let's add some validation to our form.
+
+   - Check the validators list and add at least 3 validators to the form;
+   - Do not submit the form if it is invalid;
+   - Show the error messages for each field;
+   - Update the css to highlight the invalid fields;
+
 
 
     </textarea>
