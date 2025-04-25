@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>lab_04</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="../src/style.css">
+</head>
+<body>
+<textarea id="source">
+
+class: center, middle, inverse
+
+# Angular Services
+
+---
+## How smart should a "smart component" be?
+
+// pizza-container.component.ts
+```  ts
+
+ @Component({
+    ...
+ })
+ export class PizzaContainerComponent{
+    pizzas = signal(pizzaData);
+    ...
+    onPizzaChanged($event: PizzaModel) {
+    ...
+    }
+    ...
+ }
+```
+
+Our component now has too much logic, it fetches data, it also handles updating the list
+
+---
+## Services are the solution
+
+Angular services represent a helper structure that can be used in multiple places within an app
+```
+            +----------------------+
+            |    PizzaService      |
+            |----------------------|
+            |  + getPizzas()       |
+            |  + savePizza()       |
+            +----------▲-----------+
+                       |
+         --------------|-------------
+         |                           |
+         |                           |
++------------------------+   +------------------------+
+|      ComponentA        |   |      ComponentB        |
+|------------------------|   |------------------------|
+|  Uses PizzaService     |   |  Uses PizzaService     |
+|  to get data           |   |  to get data           |
++------------------------+   +------------------------+
+```
+
+---
+## We need services to be single-instanced
+
+- Services often manage:
+  - Shared data
+  - HTTP requests
+  - App state (e.g. authentication)
+
+- If we created **multiple instances**, we’d have:
+  - 🔁 Duplicated data or logic
+  - ❌ Inconsistent state
+  - 🐞 Hard-to-find bugs
+
+✅ A **single shared instance** keeps everything in sync.
+
+---
+## Dependency injection
+
+Instead of creating the service ourselves, Angular does it for us:
+```  ts
+
+ @Component({
+    ...
+ })
+ export class ComponentA{
+    constructor(pizzaService: PizzaService){}
+    ...
+ }
+```
+
+What happens here?
+
+- Angular checks if an instance of PizzaService already exists
+- ✅ If it does → reuse the same instance
+- 🆕 If it doesn’t → create one and register it
+
+This is Dependency Injection (DI): ➡️ Angular handles the lifecycle and sharing of your service instances
+
+.footnote[*You can think of it as having a Map style structure in the background*]
+
+---
+## ⚙️ Generating a Service in Angular
+
+You can quickly generate a service using the Angular CLI:
+```bash
+ng generate service pizza
+```
+
+This creates:
+```
+app/
+├── pizza.service.ts       ← Main service logic
+└── pizza.service.spec.ts  ← Unit test for the service
+```
+
+---
+
+## Breakdown of a service class
+
+```ts
+import { Injectable } from '@angular/core';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class PizzaService {
+  constructor() { }
+}
+```
+
+- @Injectable() → Marks the class as available to Angular's Dependency Injection (DI) system.
+
+- providedIn: 'root' → Tells Angular to:
+    - 🔁 Create only one instance of this service
+
+    - 🏠 Make it available application-wide
+
+This is a singleton service shared across your app!
+
+✅ No need to manually register it — Angular handles it automatically.
+
+---
+## Used before initialization?
+
+When using a service in a signal-first Angular app, you might try this:
+
+```ts
+export class PizzaContainerComponent {
+  pizzas = this.pizzaService.getPizzas(); // ❌ TS2729 Error
+  constructor(private pizzaService: PizzaService) {}
+}
+```
+TypeScript throws:
+``` ts
+    TS2729: Property 'pizzaService' is used before its initialization.
+```
+Even though this works at runtime, TypeScript doesn't like that we're referencing this.pizzaService before the constructor finishes.
+
+
+---
+
+## Solution: Getters
+
+
+```ts
+export class PizzaContainerComponent {
+  constructor(private pizzaService: PizzaService) {}
+
+  get pizzas() {
+    return this.pizzaService.getPizzas();
+  }
+}
+```
+
+💡 Why This Works:
+
+- The pizzaService is only accessed after the constructor runs
+- TypeScript understands this is safe ✅
+- This pattern is clean, reactive, and future-friendly
+
+Signals are read synchronously, but TypeScript wants to be sure everything is set up first. By using a getter, we avoid the timing issue without giving up readability
+
+.footnote[*The pizza service will hold the pizzas signal and expose it through a getter*]
+---
+.red.bold[*Ex.4.1:] Refactor pizza section to move core functionality into a service.
+
+- Create a new service: **pizza-service**
+- Inject the service into the pizza-container component
+- Move the initialization of the pizzas signal to the service
+- Change the pizzas reference from the container-component to a getter
+- Initialize the pizzas signal from the pizza-service
+- Move the logic of updating a pizza to the pizza-service
+- Adjust the logic within pizza-container to work with pizza-service handling the list update
+
+---
+class: center, middle,inverse
+
+# Server interaction
+
+---
+
+## Server Interaction in Angular
+
+####Why?
+- Fetch Data
+- Submit Forms
+- Update Records
+
+####Angular's HTTP Client
+- Angular includes HttpClient in @angular/common/http.
+- Built on RxJS Observables, now also compatible with Signals for reactive apps.
+
+Separation of duties: Services handle logic, components focused on UI
+
+
+####Typical Flow:
+- Inject HttpClient into a service.
+- Make HTTP requests (GET, POST, PUT, DELETE, etc.).
+- Handle responses, errors, and loading state.
+- Expose data as Signals or Observables for the component.
+
+---
+
+## Observables
+
+### Observer Pattern?
+    - A design pattern where an object (called Observable) notifies other objects (Observers) about changes.
+Examples:
+- A newsletter: you subscribe once, and receive updates as they happen.
+- A button click event: you attach a listener, and it reacts when the button is clicked.
+
+.left-column[
+
+```
+              +--------------------------+
+              |  Observable (Subject)    |
+              +--------------------------+
+                         |
+        +----------------+----------------+
+        |                |                |
+        v                v                v
++----------------+  +----------------+  +----------------+
+|   Observer 1   |  |   Observer 2   |  |   Observer 3   |
++----------------+  +----------------+  +----------------+
+
+```
+]
+.right-column[
+```
+Observers subscribe to the Observable.
+When data is emitted, all subscribed observers are
+notified:
+  → next(data)
+  → error(err)
+  → complete()
+```
+]
+---
+
+## Observables in Angular/RxJS
+
+- Observables are the core primitive for handling asynchronous data streams.
+- Observers subscribe to get notified when:
+    - New data is available
+    - An error occurs
+    - The stream is complete
+
+
+``` ts
+const news$ = new Observable((observer) => {
+  observer.next('🗞️ Breaking News!');
+  observer.complete();
+});
+
+news$.subscribe((data) => console.log(data));
+
+```
+---
+
+## Observables in Angular/RxJS
+
+#### HttpClient Returns Observables
+- When you make a **GET** or **POST** request, you don’t get data immediately.
+- Angular gives you an **Observable** that will emit the response when it's ready.
+
+``` ts
+this.http.get<User[]>('/api/users'); // Returns Observable<User[]>
+
+this.http.get<User>('/api/user/123').subscribe(user=>console.log(user.name))
+```
+
+#### Integrating with Signals
+
+``` ts
+const usersSignal = toSignal(this.http.get<User[]>('/api/users'));
+```
+
+####Bottom Line
+- Observable = stream of future values
+- toSignal = bridge to reactive state in components
+
+---
+
+.red.bold[*Ex.4.2:] Integrate Pizza App with Backend server to fetch pizzas
+
+- Run the local backend server to expose the pizza data
+- Change the getPizzas method in the pizza service to fetch pizzas via HTTP get from localhost:3000/api/pizzas
+- Adjust the logic in the service so that adding/updating pizzas still works
+
+.footnote[*When adding Http Client integration into a new Angular app, you also need to add the configuration -> app.config.ts *]
+
+---
+
+## Submitting data to the backend
+
+Angular's HTTP Client works in very similar fashion for requests that also send data to the server.
+
+- **POST**: Create a new resource.
+- **PUT**: Update a resource (full replacement).
+- **PATCH**: Partially update a resource.
+- **DELETE**: Remove a resource.
+- **OPTIONS**: Retrieve allowed methods or CORS preflight checks.
+
+Same as for Get, use generics to indicate the expected response type.
+
+Examples:
+``` ts
+this.httpClient.post<PizzaModel>('http://localhost:3000/api/pizzas', newPizza);
+
+this.httpClient.put<PizzaModel>('http://localhost:3000/api/pizzas/1', updatedPizza);
+```
+
+Dynamically setting the URL parameter
+``` ts
+this.httpClient.delete<void>(`http://localhost:3000/api/pizzas/${pizzaId}`)
+```
+
+---
+
+.red.bold[*Ex.4.3:] Let's add some more backend integration.
+
+- Update pizza service to use a **POST** method for both saving/updating a pizza
+- **BONUS** : Add a delete functionality (also on the backend)
+
+
+
+    </textarea>
+<script src="../src/remark-latest.min.js">
+</script>
+<script>
+    var slideshow = remark.create({
+        ratio: '16:9'
+    });
+</script>
+</body>
+</html>
