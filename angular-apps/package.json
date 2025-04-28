@@ -22,6 +22,7 @@
     "start_lab_4_1" : "ng serve lab_4_1 --port=4217",
     "start_lab_4_1_completed" : "ng serve lab_4_1_completed --port=4218",
     "start_lab_4_2" : "ng serve lab_4_2 --port=4219",
+    "start_lab_4_2_completed" : "ng serve lab_4_2_completed --port=4220",
 
     "start_backend": "node server/server.js",
 
