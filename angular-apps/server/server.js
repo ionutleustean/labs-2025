@@ -1,0 +1,116 @@
+import express from 'express'
+import bodyParser from 'express'
+import cors from 'cors'
+
+const app = express()
+const PORT = 3000
+
+app.use(cors()) // allow requests from Angular app
+app.use(bodyParser.json()) // To parse JSON request bodies
+
+let pizzas = [
+  {
+    id: 'pizza_0_0',
+    imageUrl: '/pizzas/pizza_0_0.png',
+    name: 'Margherita',
+    description: 'Classic pizza with tomato sauce and mozzarella cheese.',
+    price: 8.99,
+    ingredients: ['Tomato Sauce', 'Mozzarella Cheese', 'Basil'],
+  },
+  {
+    id: 'pizza_0_1',
+    imageUrl: '/pizzas/pizza_0_1.png',
+    name: 'Pepperoni',
+    description: 'Spicy pepperoni with mozzarella cheese and tomato sauce.',
+    price: 9.99,
+    ingredients: ['Tomato Sauce', 'Mozzarella Cheese', 'Pepperoni'],
+  },
+  {
+    id: 'pizza_0_2',
+    imageUrl: '/pizzas/pizza_0_2.png',
+    name: 'Vegetarian',
+    description: 'Loaded with fresh vegetables and mozzarella cheese.',
+    price: 10.49,
+    ingredients: ['Tomato Sauce', 'Mozzarella Cheese', 'Bell Peppers', 'Olives', 'Onions'],
+  },
+  {
+    id: 'pizza_1_0',
+    imageUrl: '/pizzas/pizza_1_0.png',
+    name: 'BBQ Chicken',
+    description: 'Grilled chicken with BBQ sauce and red onions.',
+    price: 11.49,
+    ingredients: ['BBQ Sauce', 'Mozzarella Cheese', 'Grilled Chicken', 'Red Onions'],
+  },
+  {
+    id: 'pizza_1_1',
+    imageUrl: '/pizzas/pizza_1_1.png',
+    name: 'Hawaiian',
+    description: 'Ham and pineapple on a classic pizza base.',
+    price: 10.99,
+    ingredients: ['Tomato Sauce', 'Mozzarella Cheese', 'Ham', 'Pineapple'],
+  },
+  {
+    id: 'pizza_1_2',
+    imageUrl: '/pizzas/pizza_1_2.png',
+    name: 'Meat Lovers',
+    description: 'A carnivore\'s dream with various meats and cheese.',
+    price: 12.99,
+    ingredients: ['Tomato Sauce', 'Mozzarella Cheese', 'Pepperoni', 'Sausage', 'Bacon'],
+  },
+  {
+    id: 'pizza_2_0',
+    imageUrl: '/pizzas/pizza_2_0.png',
+    name: 'Buffalo Chicken',
+    description: 'Spicy buffalo chicken with blue cheese dressing.',
+    price: 11.99,
+    ingredients: ['Buffalo Sauce', 'Mozzarella Cheese', 'Grilled Chicken', 'Blue Cheese'],
+  },
+  {
+    id: 'pizza_2_1',
+    imageUrl: '/pizzas/pizza_2_1.png',
+    name: 'Four Cheese',
+    description: 'A blend of four delicious cheeses on a crispy crust.',
+    price: 10.99,
+    ingredients: ['Tomato Sauce', 'Mozzarella Cheese', 'Parmesan', 'Gorgonzola', 'Ricotta'],
+  },
+  {
+    id: 'pizza_2_2',
+    imageUrl: '/pizzas/pizza_2_2.png',
+    name: 'Pesto Veggie',
+    description: 'Fresh vegetables with pesto sauce and mozzarella cheese.',
+    price: 10.49,
+    ingredients: ['Pesto Sauce', 'Mozzarella Cheese', 'Zucchini', 'Spinach', 'Feta Cheese'],
+  },
+
+];
+
+app.get('/api/pizzas', (req, res) => {
+  res.json(pizzas)
+})
+
+app.post('/api/pizzas', (req, res) => {
+  const {id, imageUrl, name, description, price, ingredients} = req.body
+
+  if (!name || !description) {
+    return res.status(400).json({message: 'Name and description are required.'})
+  }
+
+  const tempPizzas = [...pizzas];
+  const index = tempPizzas.findIndex(p => p.id === id)
+
+  const newPizza = {id, imageUrl, name, description, price, ingredients}
+  if (index !== -1) {
+    tempPizzas[index] = newPizza
+    pizzas = tempPizzas
+  } else {
+    pizzas = [...tempPizzas, newPizza]
+  }
+
+  // Send back the newly added pizza
+  res.status(201).json(newPizza)
+})
+
+
+app.listen(PORT, () => {
+  console.log(`✅ Mock API running at http://localhost:${PORT}`)
+})
