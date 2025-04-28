@@ -305,7 +305,7 @@ const usersSignal = toSignal(this.http.get<User[]>('/api/users'));
 - Change the getPizzas method in the pizza service to fetch pizzas via HTTP get from localhost:3000/api/pizzas
 - Adjust the logic in the service so that adding/updating pizzas still works
 
-.footnote[*When adding Http Client integration into a new Angular app, you also need to add the configuration -> app.config.ts *]
+.footnote[*When adding Http Client integration into a new Angular app, you also need to add the configuration provideHttpClient() -> app.config.ts *]
 
 ---
 
