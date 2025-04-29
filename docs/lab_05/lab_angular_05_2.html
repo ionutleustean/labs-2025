@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>lab_04</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="../src/style.css">
+</head>
+<body>
+<textarea id="source">
+
+class: center, middle, inverse
+
+# Reactivity
+
+
+---
+```typescript
+
+export class Person {
+
+    private _age: number = 12;
+
+    get age(): number {
+        return this._age;
+    }
+
+    set age(value: number) {
+        this._age = value;
+    }
+
+}
+
+What happens when we call the getter?
+
+```
+
+---
+
+```typescript
+
+
+t0
+--▪
+  |
+get()
+  ▼
+--▪▪
+   |
+ render()
+   ▽
+
+```
+
+
+```typescript
+   12
+```
+
+
+---
+
+```typescript
+             |
+          set(24)
+t0        t1 ▼
+--▪----------▪
+  |
+get()
+  ▼
+--▪▪
+   |
+ render()
+   ▽
+
+```
+
+
+```typescript
+   12
+```
+
+
+
+---
+
+```typescript
+             |                |
+          set(24)          set(32)
+t0        t1 ▼             t2 ▼
+--▪----------▪----------------▪
+  |
+get()
+  ▼
+--▪▪
+   |
+ render()
+   ▽
+
+```
+
+
+```typescript
+   12
+```
+
+---
+
+```typescript
+             |                |
+          set(24)          set(32)
+t0        t1 ▼             t2 ▼     t3
+--▪----------▪----------------▪-----▪........................................................
+  |                                 |
+get()                             get()
+  ▼                                 ▼
+--▪▪--------------------------------▪▪.......................................................
+   |                                 |
+ render()                         render()
+   ▽                                 ▽
+
+```
+
+
+```typescript
+   32
+```
+
+
+---
+
+```typescript
+             |                |
+          set(24)          set(32)
+t0        t1 ▼             t2 ▼     t3
+--▪----------▪----------------▪-----▪........................................................
+  |                                 |
+get()                             get()
+  ▼                                 ▼
+--▪▪--------------------------------▪▪.......................................................
+   |                                 |
+isOver18()                         isOver18()
+   ▽                                 ▽
+---▪▪--------------------------------▪▪.......................................................
+    |                                 |
+ render()                         render()
+    ▽                                 ▽
+```
+
+
+```typescript
+   true
+```
+
+---
+
+```typescript
+             |                |
+          set(24)          set(32)
+t0        t1 ▼             t2 ▼     t3
+--▪----------▪----------------▪-----▪........................................................
+  |                                 |
+get()                             get()
+  ▼                                 ▼
+--▪▪--------------------------------▪▪.......................................................
+   |                                 |
+isOver18()                         isOver18()
+   ▽                                 ▽
+---▪▪--------------------------------▪▪.......................................................
+    |                                 |
+ render()                         render()
+    ▽                                 ▽
+```
+
+
+```typescript
+   true
+```
+
+.important[
+    ? Is get() calling an other function ?
+]
+
+
+---
+
+```typescript
+             |                |
+          set(24)          set(32)
+t0        t1 ▼             t2 ▼     t3
+--▪----------▪----------------▪-----▪........................................................
+  |                                 |
+get()                             get()
+  ▼                                 ▼
+--▪▪--------------------------------▪▪.......................................................
+   |                                 |
+isOver18()                         isOver18()
+   ▽                                 ▽
+---▪▪--------------------------------▪▪.......................................................
+    |                                 |
+ render()                         render()
+    ▽                                 ▽
+```
+
+
+```typescript
+   true
+```
+.red[
+| SRP (Single Responsibility)        
+| CQS (Command-Query Separation)     
+| Referential Transparency           
+| Principle of Least Astonishment    
+| Liskov Substitution Principle      
+| KISS (Keep It Simple, Stupid)       
+| Open/Closed Principle              
+
+]
+
+
+---
+
+**S1: extract all the  methods calls in one function (Function Composition)**
+
+
+ex:
+```typescript
+
+
+   command() {
+        person.set(32);
+        utils.isOver18(person);
+        render();
+    }
+
+
+```
+
+
+
+
+.left-column[
+👎
+  1. Method (function) explosion
+  2. Not all needed APIs are available
+  3. Coupling
+]
+
+.right-column[
+👍
+   1. Get all values
+   2. Efficient
+]
+---
+
+
+
+
+**S2: Timers**
+
+```typescript
+             |                |
+          set(24)          set(32)
+t0        t1 ▼             t2 ▼     t3
+--▪----------▪----------------▪-----▪........................................................
+
+
+
+--▪--------▪--------▪--------▪---------▪-------▪.............................................
+  |1s      |1.5s    |2s      |2.5s     |3s     |3.5s
+iO18()   iO18()   iO18()   iO18()    iO18()  iO18()
+  ▽        ▽        ▽        ▽         ▽       ▽
+
+
+--▪-----------------▪------------------▪--------.............................................
+  |1s               |2s                |3s
+render()         render()           render()
+  ▽                ▽                   ▽
+
+...
+```
+
+
+.left-column[
+👎
+1. We miss some values
+2. To much processing
+]
+
+
+.right-column[
+👍
+1. Decoupling
+
+]
+
+---
+
+**S3: Reactive programing **
+
+Best of both worlds!
+
+```typescript
+             |                |
+          set(24)          set(32)
+t0        t1 ▼             t2 ▼
+-------------▪----------------▪------........................................................
+  ▲
+subscribe()
+  |
+-------------▪----------------▪-----.......................................................
+             |                |
+         isOver18()       isOver18()
+             ▽                ▽
+-------------▪----------------▪--------.......................................................
+             |                |
+          render()         render()
+             ▽                ▽
+```
+
+
+Instead of timers we **observe** the changes in the data **stream**.
+
+And then we can use **Function Composition** (pipe) to process the data
+
+---
+
+## In Angular we have
+
+.left-column[
+###Observables
+1. Asynchronous
+2. May not have a value yet or at all
+3. Push based (always reactive)
+4. Huge set of operators (map, merge, switchMap, etc.)
+5. Complex async flows (HTTP, WebSockets, etc.)
+
+]
+
+.right-column[
+###Signals
+1. Synchronous
+2. Always have a value
+3. Pull based by default
+4. Push based in reactive context
+5. Simple UI reactivity, local component state
+]
+
+
+---
+
+# Signals
+
+1. **Synchronous**
+        Data is available immediately (no need to wait)
+2. **Always have a value**
+        Get the value at the time of the call
+3. **Pull based by default**
+        Get the value "only" when called
+4. **Push based in reactive context**
+
+    If the value changes over time, it will notify the caller automatically — as long as we're within
+    `Angular's reactive context`.
+.red[
+    Reactive context: ` template `, ` computed `, ` effect `
+]
+
+---
+
+###Template
+
+```html
+<div>{{ counter() }}</div>
+```
+Angular tracks `counter()`, and re-renders the `<div>` automatically when the signal changes.
+
+
+---
+### Computed
+
+
+The `computed()` function in Angular allows you to **derive a value based on one or more signals**. It automatically re-evaluates when any of its dependencies change, and it caches the result until then.
+
+```ts
+const firstName = signal('John');
+const lastName = signal('Doe');
+
+const fullName = computed(() => `${firstName()} ${lastName()}`);
+
+console.log(fullName()); // "John Doe"
+```
+
+- `computed()` only recalculates when one of the signals it uses (`firstName`, `lastName`) changes.
+- It is **lazy**: it runs only when needed.
+- It’s similar to a **getter** that automatically tracks dependencies.
+
+This is ideal for **derived state**, where the value is based on other signals but should always be consistent and memoized.
+
+---
+
+```typescript
+import { signal, computed } from '@angular/core';
+
+const user = signal({ id: 1, name: 'Alice', age: 30, hobbies: ['reading', 'gaming'] });
+const role = signal('admin');
+
+const userInfo = computed(() => {
+  const { id, name } = user();
+  return { id, name };
+});
+
+const userProfile = computed(() => ({
+  ...userInfo(),
+  role: role()
+}));
+
+console.log(userProfile());
+// Output: { id: 1, name: 'Alice', role: 'admin' }
+```
+
+.important[
+
+    Always use `computed` when you need to derive a value based on other signals.
+
+    Provide child components with just the information relevant to them.
+
+]
+
+---
+Ex1 :
+
+
+
+    </textarea>
+<script src="../src/remark-latest.min.js">
+</script>
+<script>
+    var slideshow = remark.create({
+        ratio: '16:9'
+    });
+</script>
+</body>
+</html>
+
