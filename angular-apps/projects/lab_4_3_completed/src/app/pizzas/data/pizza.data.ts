@@ -1,14 +1,7 @@
-import express from 'express'
-import bodyParser from 'express'
-import cors from 'cors'
+import {PizzaModel} from '../domain/pizza.model';
 
-const app = express()
-const PORT = 3000
 
-app.use(cors()) // allow requests from Angular app
-app.use(bodyParser.json()) // To parse JSON request bodies
-
-let pizzas = [
+export const pizzaData: PizzaModel[] = [
   {
     id: 'pizza_0_0',
     imageUrl: '/pizzas/pizza_0_0.png',
@@ -82,42 +75,5 @@ let pizzas = [
     ingredients: ['Pesto Sauce', 'Mozzarella Cheese', 'Zucchini', 'Spinach', 'Feta Cheese'],
   },
 
-];
+]
 
-app.get('/api/pizzas', (req, res) => {
-  res.json(pizzas)
-})
-
-app.post('/api/pizzas', (req, res) => {
-  const {id, imageUrl, name, description, price, ingredients} = req.body
-
-  if (!name || !description) {
-    return res.status(400).json({message: 'Name and description are required.'})
-  }
-
-  const tempPizzas = [...pizzas];
-  const index = tempPizzas.findIndex(p => p.id === id)
-
-  const newPizza = {id, imageUrl, name, description, price, ingredients}
-  if (index !== -1) {
-    tempPizzas[index] = newPizza
-    pizzas = tempPizzas
-  } else {
-    pizzas = [...tempPizzas, newPizza]
-  }
-
-  // Send back the newly added pizza
-  res.status(201).json(newPizza)
-})
-
-app.delete('/api/pizzas/:id', (req, res) => {
-  const id = req.params['id']
-  pizzas = pizzas.filter(item => item.id !== id)
-  // Send back the newly added pizza
-  res.status(201).json("deleted successfully!")
-})
-
-
-app.listen(PORT, () => {
-  console.log(`✅ Mock API running at http://localhost:${PORT}`)
-})
