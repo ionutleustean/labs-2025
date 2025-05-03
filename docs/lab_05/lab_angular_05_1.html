@@ -91,12 +91,28 @@ import { AbstractControl, ValidationErrors } from '@angular/forms';
 
 export function createPasswordStrengthValidator() {
   return (control: AbstractControl): ValidationErrors | null => {
+    const errors: ValidationErrors = {};
+
     const value = control.value || '';
     const hasUpper = /[A-Z]/.test(value);
+    if (!hasUpper) {
+        errors['hasUpper'] = true;
+    }
     const hasLower = /[a-z]/.test(value);
+    if (!hasLower) {
+        errors['hasLower'] = true;
+    }
     const hasNumber = /\d/.test(value);
-    const isValid = hasUpper && hasLower && hasNumber && value.length >= 8;
-    return isValid ? null : { passwordStrength: true };
+    if (!hasNumber) {
+        errors['hasNumber'] = true;
+    }
+    const isLongEnough = value.length >= 8;
+    if (!isLongEnough) {
+        errors['isLongEnough'] = true;
+    }
+
+    // Return null if no errors, otherwise return the errors object
+    return Object.keys(errors).length ? errors : null;
   };
 }
 ```
@@ -180,19 +196,11 @@ export class PasswordStrengthDirective implements Validator {
 
 ```html
 <form #registerForm="ngForm" (ngSubmit)="register(registerForm, $event)">
-  <input matInput
-         type="email"
-         name="email"
-         ngModel
-         #email="ngModel"
-         required
-         email
-         minlength="3"
-         maxlength="20"
+  <input
+        ....
          placeholder="Email">
 
-  <input matInput
-         type="password"
+  <input type="password"
          name="password"
          ngModel
          #password="ngModel"
@@ -200,6 +208,14 @@ export class PasswordStrengthDirective implements Validator {
          passwordStrength
          minlength="8"
          placeholder="Password">
+  @if (pizzaForm.submitted && ingredientsControl.errors) {
+    <div class="text-red">
+      {{ ingredientsControl.errors['hasLower'] ? 'Must contain at least one lowercase character.' : '' }}
+      {{ ingredientsControl.errors['hasUpper'] ? 'Must contain at least one uppercase character.' : '' }}
+      {{ ingredientsControl.errors['isLongEnough'] ? 'Password must be at least 8 characters.' : '' }}
+      {{ ingredientsControl.errors['hasNumber'] ? 'Password must contain at least one number.' : '' }}
+    </div>
+    }
 ...
 ```
 
