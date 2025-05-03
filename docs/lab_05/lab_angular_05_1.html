@@ -302,9 +302,9 @@ We're going to use an emoji for the example and manipulate it so we get it greye
 <span
   *ngFor="let _ of stars; let i = index"
   (click)="onClick(i + 1)"
-  [style.filter]="rating() > i
-                  ? 'none'
-                  : 'grayscale(100%) brightness(85%)'">
+  [style]="rating() > i
+            ? 'filter: none; opacity: 1'
+            : 'filter: grayscale(100%) brightness(90%); opacity: 0.3'">
   ⭐
 </span>
 ```
@@ -381,8 +381,9 @@ export class StarRatingComponent implements ControlValueAccessor {
   <label>Rate our service:</label>
   <star-rating
     name="serviceRating"
-    ngModel
-    #serviceRating="ngModel">
+    [ngModel]="values().rating"
+    (ngModelChange)="ratingChanged($event)"
+    >
   </star-rating>
 
   <button type="submit" [disabled]="!feedbackForm.valid">
@@ -400,10 +401,18 @@ export class StarRatingComponent implements ControlValueAccessor {
 .red.bold[*Ex.5.2:] Create a ControlValueAccessor for the hotness of our pizza.
 
 - Use a star-like system to rate the hotness of our pizza.
-    - Hotness is a number between 1 and 5.
+    - Hotness is a number between 0 and 5.
+
 - Add the `hotness` property to our pizza model.
+
+- Generate a HotnessRating component.
+
 - Implement the `ControlValueAccessor` interface and the associated methods.
-- Use the `ngModel` directive to bind the value to a form control.
+
+- Use `ngModel` and `ngModelChange` to bind to a form control.
+
+- Display the hotness of each pizza in the list of pizzas.
+    - You can just display the number for now.
 
 ---
 
