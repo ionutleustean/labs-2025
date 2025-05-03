@@ -203,17 +203,17 @@ export class PasswordStrengthDirective implements Validator {
   <input type="password"
          name="password"
          ngModel
-         #password="ngModel"
+         #passwordControl="ngModel"
          required
          passwordStrength
          minlength="8"
          placeholder="Password">
-  @if (pizzaForm.submitted && ingredientsControl.errors) {
+  @if (registerForm.submitted && passwordControl.errors) {
     <div class="text-red">
-      {{ ingredientsControl.errors['hasLower'] ? 'Must contain at least one lowercase character.' : '' }}
-      {{ ingredientsControl.errors['hasUpper'] ? 'Must contain at least one uppercase character.' : '' }}
-      {{ ingredientsControl.errors['isLongEnough'] ? 'Password must be at least 8 characters.' : '' }}
-      {{ ingredientsControl.errors['hasNumber'] ? 'Password must contain at least one number.' : '' }}
+      {{ passwordControl.errors['hasLower'] ? 'Must contain at least one lowercase character.' : '' }}
+      {{ passwordControl.errors['hasUpper'] ? 'Must contain at least one uppercase character.' : '' }}
+      {{ passwordControl.errors['isLongEnough'] ? 'Password must be at least 8 characters.' : '' }}
+      {{ passwordControl.errors['hasNumber'] ? 'Password must contain at least one number.' : '' }}
     </div>
     }
 ...
