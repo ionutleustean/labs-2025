@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Angular Forms: Custom Validators & CVA</title>
+  <link rel="stylesheet" href="../src/style.css">
+  <script src="../src/remark-latest.min.js"></script>
+</head>
+<body>
+<textarea id="source">
+class: center, middle, inverse
+# Angular Forms
+## Custom Validators & ControlValueAccessor
+
+---
+# What Is a Form-Field Validator?
+
+- **Form Value**
+    
+    - The combined values of all its fields
+        
+- **Form Validity State** (we used this in onSubmit, the `form.valid` property, remember?)
+    
+    - `true` if **every** field is valid
+        
+    - `false` as soon as **any** field is invalid
+        
+
+Each **form field** carries its own set of business rules (e.g. “required,” “min length of 10,” etc.) which are enforced by validators.
+
+---
+## Field-Level Validators: Definition
+
+A **Validator** is simply a function that:
+
+1. Takes a `FormControl` (i.e. a single field)
+    
+2. Checks its value against one or more rules
+    
+3. Returns
+    
+    - `null` if the field is **valid**
+        
+    - An **error map** (e.g. `{ required: true }`) if the field is **invalid**
+
+---
+
+## How Validators Are Applied
+
+- **Template-Driven Forms**
+    
+    ```html
+    <input
+      name="username"
+      ngModel
+      required
+      minlength="10"
+      #username="ngModel">
+    ```
+    
+- **Reactive Forms**
+    
+    ```ts
+    new FormControl(
+      '',
+      [ Validators.required, Validators.minLength(10) ]
+    );
+    ```
+    
+
+Here, Angular wires up each validator function behind the scenes, updating the field’s validity state and propagating it to the parent form.
+
+---
+
+# Custom Validators in Template-Driven Forms
+
+- All validation rules live in the **template** via directives
+
+- Unlike Reactive Forms, you must supply both:
+
+    1. A **validator function**
+
+    2. A **directive** that registers it with Angular’s DI
+
+---
+
+## Simple Password-Strength Validator
+
+```ts
+import { AbstractControl, ValidationErrors } from '@angular/forms';
+
+export function createPasswordStrengthValidator() {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const value = control.value || '';
+    const hasUpper = /[A-Z]/.test(value);
+    const hasLower = /[a-z]/.test(value);
+    const hasNumber = /\d/.test(value);
+    const isValid = hasUpper && hasLower && hasNumber && value.length >= 8;
+    return isValid ? null : { passwordStrength: true };
+  };
+}
+```
+
+Checks that the password has:
+
+- ≥ 8 characters
+- At least one uppercase letter
+- At least one lowercase letter
+- At least one number
+
+We return:
+- `null` if the password is valid
+- `{ passwordStrength: true }` if the password is invalid
+
+---
+
+## What Is a Directive?
+
+- A class that adds behavior or transforms elements in your template
+
+- Declared with a **selector**
+
+- Built-in examples: `*ngIf`, `minLength`, `ngModel`
+
+- Custom directives let you extend HTML with your own functionality
+
+---
+
+## Custom Validator Directive: Skeleton
+
+```ts
+import { Directive } from '@angular/core';
+import {
+  AbstractControl,
+  NG_VALIDATORS,
+  ValidationErrors,
+  Validator
+} from '@angular/forms';
+import { createPasswordStrengthValidator } from '../validators/password-strength.validator';
+
+@Directive({
+  selector: '[passwordStrength]',
+  providers: [{
+    provide: NG_VALIDATORS,
+    useExisting: PasswordStrengthDirective,
+    multi: true
+  }]
+})
+export class PasswordStrengthDirective implements Validator {
+  validate(control: AbstractControl): ValidationErrors | null {
+    // Delegate to our pure validator factory
+    return createPasswordStrengthValidator()(control);
+  }
+}
+```
+
+---
+
+## Directive Breakdown
+
+- **Selector**: `"[passwordStrength]"` → in the template we will not use the `[]` brackets
+    
+- **Providers**:
+    
+    - Registers under `NG_VALIDATORS`
+        
+    - `multi: true` → allows stacking with other validators
+
+    - `useExisting: PasswordStrengthDirective` → tells Angular to reuse the directive instance itself as the validator provider
+        
+- **Implements**: `Validator` interface
+    
+    - Method: `validate(control: AbstractControl): ValidationErrors | null`
+        
+- **Delegation**: Calls the `createPasswordStrengthValidator()`
+
+---
+
+## Using a Custom Validator Directive in our form:
+
+```html
+<form #registerForm="ngForm" (ngSubmit)="register(registerForm, $event)">
+  <input matInput
+         type="email"
+         name="email"
+         ngModel
+         #email="ngModel"
+         required
+         email
+         minlength="3"
+         maxlength="20"
+         placeholder="Email">
+
+  <input matInput
+         type="password"
+         name="password"
+         ngModel
+         #password="ngModel"
+         required
+         passwordStrength
+         minlength="8"
+         placeholder="Password">
+...
+```
+
+- Built-in directives: `required`, `email`, `minlength`, `maxlength`
+- **Custom** directive: `passwordStrength`
+
+---
+
+.red.bold[*Ex.5.1:] Create a custom validator directive for our pizza form.
+
+We want our ingredient list to:
+
+- Be at least 3 items long
+
+- Not contain duplicates
+
+- Not contain the word "pineapple"
+
+- Not contain special characters ( `!.@#$%^&*()_+` )
+
+
+---
+
+
+## What is ControlValueAccessor (CVA)?
+A **CVA** is a bridge between Angular Forms API and a custom UI component.
+
+- Syncs the model ↔ view via methods in the ControlValueAccessor interface
+
+    - Receive form model updates
+
+    - Notify the form when its value changes
+
+    - Reflect touched/disabled states
+
+---
+
+## Why Use a CVA?
+
+- Treat custom components like standard form controls in template-driven forms
+    
+- Automatic binding for `ngModel`, validation, and change handling
+    
+- Reduces boilerplate: Angular manages value propagation and change detection
+   
+
+**Examples:** 
+- **Price Range Slider**: Creates a dual-handle slider for min/max price selection
+- **Phone Input**: Combines country code dropdown with phone input field
+- **Rating Component**: Visual star/number rating that maps to numeric value
+
+---
+
+## CVA Interface Methods
+
+.large[
+
+| Method                   | Does                                    |
+|--------------------------|-----------------------------------------|
+| writeValue(value: any)   | Sets UI state when form model changes   |
+| registerOnChange(fn)     | Store callback; call on value change    |
+| registerOnTouched(fn)    | Store callback; call on touch events    |
+| setDisabledState(isOff)  | Enable/disable UI                       |
+]
+
+**Flow of data**:
+
+```
+FormControl <--> NgControl <--> ControlValueAccessor <--> CustomComponent
+```
+
+---
+
+
+## Star Rating CVA HTML
+
+We're going to use an emoji for the example and manipulate it so we get it greyed out.
+- In a real app, we would usually use an icon library (e.g. FontAwesome, Material Icons, etc.) or SVGs.
+- Emojis are unicode characters that can be displayed in HTML.
+
+```html
+<!-- ./star-rating.component.html -->
+
+<span
+  *ngFor="let _ of stars; let i = index"
+  (click)="onClick(i + 1)"
+  [style.filter]="rating() > i
+                  ? 'none'
+                  : 'grayscale(100%) brightness(85%)'">
+  ⭐
+</span>
+```
+
+What it'd look like:
+
+<div style="
+  display: inline-block;
+  background-color: #f5f5f5;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  padding: 16px;
+  font-family: sans-serif;
+">
+  <label style="
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+  ">
+    Rate our service:
+  </label>
+  <span style="font-size: 1.5rem;">⭐</span>
+  <span style="font-size: 1.5rem;">⭐</span>
+  <span style="font-size: 1.5rem;">⭐</span>
+  <span style="
+    font-size: 1.5rem;
+    filter: grayscale(100%) brightness(85%);
+  ">⭐</span>
+  <span style="
+    font-size: 1.5rem;
+    filter: grayscale(100%) brightness(85%);
+  ">⭐</span>
+</div>
+
+
+---
+
+## CVA Example: Star Rating Component
+
+```ts
+@Component({
+  selector: 'star-rating',
+  templateUrl: './star-rating.component.html',
+  providers: [{
+    provide: NG_VALUE_ACCESSOR,
+    useExisting: forwardRef(() => StarRatingComponent),
+    multi: true
+  }]
+})
+export class StarRatingComponent implements ControlValueAccessor {
+  stars = Array(5).fill(0);
+  rating = signal(0);
+  private onChange = (value: number) => {}; // initialize as empty callback
+  private onTouched = () => {}; // // initialize as empty callback
+
+  writeValue(value: number): void { this.rating.set(value); }
+  registerOnChange(fn: any): void { this.onChange = fn; } // set callback
+  registerOnTouched(fn: any): void { this.onTouched = fn; } // set callback
+  setDisabledState?(isDisabled: boolean): void { // handle disabled state}
+
+  onClick(value: number): void {
+    this.rating.set(value);
+    this.onChange(value);
+    this.onTouched();
+  }
+}
+```
+---
+
+## Using Star Rating in Template-Driven Forms
+
+```html
+<form #feedbackForm="ngForm" (ngSubmit)="submit(feedbackForm)">
+  <label>Rate our service:</label>
+  <star-rating
+    name="serviceRating"
+    ngModel
+    #serviceRating="ngModel">
+  </star-rating>
+
+  <button type="submit" [disabled]="!feedbackForm.valid">
+    Submit
+  </button>
+</form>
+```
+
+- Uses **signals** inside the component for state
+    
+- Two-way binding via calling the stored `onChange` callback
+
+---
+
+.red.bold[*Ex.5.2:] Create a ControlValueAccessor for the hotness of our pizza.
+
+- Use a star-like system to rate the hotness of our pizza.
+    - Hotness is a number between 1 and 5.
+- Add the `hotness` property to our pizza model.
+- Implement the `ControlValueAccessor` interface and the associated methods.
+- Use the `ngModel` directive to bind the value to a form control.
+
+---
+
+</textarea>
+<script>
+  remark.create({ ratio: '16:9' });
+</script>
+</body>
+</html>

@@ -160,6 +160,10 @@ table {
     font-size: 14px;
 }
 
+.large table {
+    font-size: 26px;
+  }
+
 th, td {
     border: 1px solid #ddd;
     padding: 8px 12px;
