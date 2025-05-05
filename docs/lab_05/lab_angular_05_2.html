@@ -375,7 +375,7 @@ Angular tracks `counter()`, and re-renders the `<div>` automatically when the si
 
 
 ---
-### Computed
+### computed
 
 
 The `computed()` function in Angular allows you to **derive a value based on one or more signals**. It automatically re-evaluates when any of its dependencies change, and it caches the result until then.
@@ -426,9 +426,103 @@ console.log(userProfile());
 ]
 
 ---
-Ex1 :
+.red.bold[*Ex.5.3:] Using computed api.
+
+Create a signal for price that concatenate the pizza price with the currency "RON" and display it in the template.
 
 
+---
+
+.red.bold[*Ex.5.4:] Using computed api.
+
+    Create a new section in the home page : "Hottest pizza"
+    This section will receive the pizza array as input
+    Using the computed api
+        - create a signal that will return the first 3 hottest pizzas, sorted by hottness.
+        - this new array will have only the id, name, hottness and imageUrl properties.
+        - render this array in the template.
+
+
+---
+### effect
+
+The `effect()` function sets up **reactive side effects** — code that should run automatically when signals it depends on change.
+
+```ts
+constructor() {
+    effect(() => {
+      console.log(`Full name is: ${fullName()}`);
+    });
+}
+
+firstName.set('Jane');
+// Console: "Full name is: Jane Doe"
+```
+
+- `effect()` tracks any signals accessed inside it and re-runs when any of them change.
+- It’s ideal for **running imperative logic** such logging, syncing with external systems, external lybraries etc.
+- Use `effect()` when you want something to **react to signal changes but don’t return a value**.
+
+Think of it like a **watcher** or **reaction handler**.
+
+---
+.red.bold[*Ex.5.4:] Using effect api.
+
+Whenever the pizza list changes, log a message using MessageService to notify the user. The message should include the updated list of pizzas.
+
+ - Use the effect() function to observe the pizzaList signal.
+ - Call MessageService.log() inside the effect to log a message.
+ - Include the current value of the pizzaList in the message.
+
+---
+## Interop Between Signals and Observables
+
+
+.small[
+.left-column[
+### 🔁 `toSignal()`: Observable ➞ Signal
+
+Use when you want to **consume an Observable as a Signal** in a reactive component.
+
+```ts
+ user$ = http.get<User>('/api/user');
+ userSignal = toSignal(user$);
+```
+
+✅ Automatically subscribes
+✅ Updates Signal value on new emissions
+⚠️ Optionally provide an initial value if the Observable is async
+
+```ts
+ userSignal = toSignal(user$, { initialValue: null });
+```
+
+]
+.right-column[
+
+### 🔁 `toObservable()`: Signal ➞ Observable
+
+Use when you need to **expose a Signal to code expecting an Observable**,
+like services or RxJS operators.
+
+```ts
+ count = signal(0);
+ count$ = toObservable(count);
+```
+
+✅ Emits new values when Signal changes
+✅ Fully compatible with RxJS pipelines
+
+```ts
+count$.pipe(
+  debounceTime(300),
+  tap(value => console.log(value))
+).subscribe();
+```
+
+]]
+
+---
 
     </textarea>
 <script src="../src/remark-latest.min.js">

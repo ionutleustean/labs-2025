@@ -1,4 +1,4 @@
-import {Component, signal} from '@angular/core';
+import {Component, inject, signal} from '@angular/core';
 import {FeaturePizzaListComponent} from '../feature-pizza-list/feature-pizza-list.component';
 import {PizzaFormComponent} from '../pizza-form/pizza-form.component';
 import {PizzaModel} from '../domain/pizza.model';
@@ -15,12 +15,10 @@ import {PizzaService} from '../pizza.service';
 })
 export class PizzaContainerComponent {
 
-  constructor(private pizzaService: PizzaService) {
-  }
 
-  get pizzas() {
-    return this.pizzaService.getPizzas()
-  }
+  private readonly pizzaService = inject(PizzaService)
+
+  pizzas = this.pizzaService.getPizzas();
 
   pizza = signal<PizzaModel | null>(null);
 
