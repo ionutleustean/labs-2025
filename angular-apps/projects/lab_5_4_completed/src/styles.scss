@@ -1,0 +1,20 @@
+/* You can add global styles to this file, and also import other style files */
+
+@import "bootstrap/scss/bootstrap";
+
+
+.ng-submitted {
+  .ng-invalid {
+    border: 1px solid red;
+  }
+}
+
+
+.text-red {
+  color: red;
+}
+
+
+.gray-scale {
+  filter: grayscale(100%) brightness(150%);
+}
