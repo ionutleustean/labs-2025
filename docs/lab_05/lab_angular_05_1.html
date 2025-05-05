@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
-  <title>Angular Forms: Custom Validators & CVA</title>
-  <link rel="stylesheet" href="../src/style.css">
-  <script src="../src/remark-latest.min.js"></script>
+    <meta charset="utf-8">
+    <title>Angular Forms: Custom Validators & CVA</title>
+    <link rel="stylesheet" href="../src/style.css">
+    <script src="../src/remark-latest.min.js"></script>
 </head>
 <body>
 <textarea id="source">
@@ -95,21 +95,16 @@ export function createPasswordStrengthValidator() {
 
     const value = control.value || '';
     const hasUpper = /[A-Z]/.test(value);
-    if (!hasUpper) {
-        errors['hasUpper'] = true;
-    }
+    if (!hasUpper) { errors['hasUpper'] = true; }
+
     const hasLower = /[a-z]/.test(value);
-    if (!hasLower) {
-        errors['hasLower'] = true;
-    }
+    if (!hasLower) { errors['hasLower'] = true; }
+
     const hasNumber = /\d/.test(value);
-    if (!hasNumber) {
-        errors['hasNumber'] = true;
-    }
+    if (!hasNumber) { errors['hasNumber'] = true; }
+
     const isLongEnough = value.length >= 8;
-    if (!isLongEnough) {
-        errors['isLongEnough'] = true;
-    }
+    if (!isLongEnough) { errors['isLongEnough'] = true;}
 
     // Return null if no errors, otherwise return the errors object
     return Object.keys(errors).length ? errors : null;
@@ -117,17 +112,28 @@ export function createPasswordStrengthValidator() {
 }
 ```
 
-Checks that the password has:
+---
+
+The validator checks that the password complies with:
 
 - ≥ 8 characters
 - At least one uppercase letter
 - At least one lowercase letter
 - At least one number
+- Is long enough
 
 We return:
 - `null` if the password is valid
-- `{ passwordStrength: true }` if the password is invalid
+- or an object with the errors:
 
+```ts
+{
+  hasUpper: true,
+  hasLower: true,
+  hasNumber: true,
+  isLongEnough: true
+}
+```
 ---
 
 ## What Is a Directive?
@@ -216,9 +222,7 @@ export class PasswordStrengthDirective implements Validator {
       {{ passwordControl.errors['hasNumber'] ? 'Password must contain at least one number.' : '' }}
     </div>
     }
-...
 ```
-
 - Built-in directives: `required`, `email`, `minlength`, `maxlength`
 - **Custom** directive: `passwordStrength`
 
@@ -418,7 +422,7 @@ export class StarRatingComponent implements ControlValueAccessor {
 
 </textarea>
 <script>
-  remark.create({ ratio: '16:9' });
+    remark.create({ ratio: '16:9' });
 </script>
 </body>
 </html>
