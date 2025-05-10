@@ -1,14 +1,7 @@
-import express from 'express'
-import bodyParser from 'express'
-import cors from 'cors'
+import {PizzaModel} from '../domain/pizza.model';
 
-const app = express()
-const PORT = 3000
 
-app.use(cors()) // allow requests from Angular app
-app.use(bodyParser.json()) // To parse JSON request bodies
-
-let pizzas = [
+export const pizzaData: PizzaModel[] = [
   {
     id: 'pizza_0_0',
     imageUrl: '/pizzas/pizza_0_0.png',
@@ -90,80 +83,6 @@ let pizzas = [
     ingredients: ['Pesto Sauce', 'Mozzarella Cheese', 'Zucchini', 'Spinach', 'Feta Cheese'],
     hotness: 0
   },
-];
 
-let stores = [
-  {
-    id: 's1',
-    imageUrl: '/stores/store1.png',
-    name: 'Unirii',
-    description: 'Located in the Unirii Square, the heart of the city',
-    address: 'Unirii Square, no 15'
-  },
-  {
-    id: 's2',
-    imageUrl: '/stores/store2.png',
-    name: 'Traian',
-    description: 'Located in Traian Square, a new hip location',
-    address: 'Traian Square, no 29'
-  },
-  {
-    id: 's3',
-    imageUrl: '/stores/store3.png',
-    name: 'Iulius',
-    description: 'Located in the biggest shopping mall of the city',
-    address: 'Iulius Town, ground floor'
-  }
-];
+]
 
-app.get('/api/pizzas', (req, res) => {
-  res.json(pizzas)
-})
-
-app.get('/api/stores', (req, res) => {
-  res.json(stores)
-})
-
-app.get('/api/stores/:id', (req, res) => {
-  const id = req.params['id']
-  const aStore = stores.find(item => item.id === id)
-  res.json(aStore)
-})
-
-app.get('/api/auth', (req, res) => {
-  res.json(false)
-})
-
-app.post('/api/pizzas', (req, res) => {
-  const {id, imageUrl, name, description, price, ingredients, hotness} = req.body
-
-  if (!name || !description) {
-    return res.status(400).json({message: 'Name and description are required.'})
-  }
-
-  const tempPizzas = [...pizzas];
-  const index = tempPizzas.findIndex(p => p.id === id)
-
-  const newPizza = {id, imageUrl, name, description, price, ingredients, hotness}
-  if (index !== -1) {
-    tempPizzas[index] = newPizza
-    pizzas = tempPizzas
-  } else {
-    pizzas = [...tempPizzas, newPizza]
-  }
-
-  // Send back the newly added pizza
-  res.status(201).json(newPizza)
-})
-
-app.delete('/api/pizzas/:id', (req, res) => {
-  const id = req.params['id']
-  pizzas = pizzas.filter(item => item.id !== id)
-  // Send back the newly added pizza
-  res.status(201).json("deleted successfully!")
-})
-
-
-app.listen(PORT, () => {
-  console.log(`✅ Mock API running at http://localhost:${PORT}`)
-})

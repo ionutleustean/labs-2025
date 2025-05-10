@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>lab_06</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="../src/style.css">
+</head>
+<body>
+<textarea id="source">
+
+class: center, middle, inverse
+
+# Angular Routing
+
+---
+## Angular Routing Overview
+
+- Enables navigation between different views/components.
+- Maps URL paths to components.
+- Updates the Router State when the URL changes.
+- Dynamically loads components based on configuration.
+
+🔗 URL → Router → Component
+
+---
+## How Angular Routing Works
+
+```
+
+         +---------------------------------+
+         |   User navigates to /pizzas/1   |
+         +-----------------------+---------+
+                         |
+                         v
+         +---------------+-----------------+
+         |   Router matches route config   |
+         +---------------+-----------------+
+                         |
+                         v
+         +---------------+-----------------+
+         |   Creates new Router State      |
+         +---------------+-----------------+
+                         |
+                         v
+         +---------------+-----------------+
+         | Loads and renders Component     |
+         |    (e.g., PizzaDetailComponent) |
+         +---------------------------------+
+```
+
+
+---
+## Router Configuration
+
+### 📌 Where is it defined?
+- Typically in a `app.routes.ts` file or directly in `app.config.ts`.
+- Passed to `provideRouter()` at application bootstrap.
+
+
+```ts
+// app.config.ts
+bootstrapApplication(AppComponent, {
+  providers: [provideRouter(appRoutes, withComponentInputBinding())]
+});
+```
+
+#### Using withComponentInputBinding() will make it so that all the route parameters will be available as inputs in the component
+
+---
+
+## Routing configuration example
+
+```  ts
+
+// routes.ts
+import { Routes } from '@angular/router';
+import { HomeComponent } from './home/home.component';
+import { ProductComponent } from './product/product.component';
+
+export const appRoutes: Routes = [
+  {
+    path: '',
+    redirectTo: 'home',
+    pathMatch: 'full'
+  },
+  {
+    path: 'home',
+    component: HomeComponent
+  },
+  {
+    path: 'products/:id',
+    component: ProductComponent
+  }
+];
+```
+
+---
+## Routing configuration breakdown
+
+```ts
+{
+  path: '',
+  redirectTo: 'home',
+  pathMatch: 'full'
+}
+```
+
+- path: ' ' → Matches the root URL (/)
+- redirectTo: 'home' → Redirects to /home
+- pathMatch: 'full' → Ensures the entire URL must match
+    - Use 'full' when you want an exact match
+    - If you use 'prefix', it would match any URL starting with '', causing unwanted redirects
+
+
+```ts
+{
+  path: 'products/:id',
+  component: ProductComponent
+}
+```
+
+- :id is a route parameter
+- Allows dynamic URLs like /products/42
+- Can be accessed in the component
+
+
+
+---
+
+## Factoring out common parts
+
+```ts
+const appRoutes: Routes = [
+  {
+    path: 'admin',
+    children: [
+      {
+        path: '',
+        component: DashboardComponent
+      },
+      {
+        path: 'users',
+        component: UsersComponent
+      }
+    ]
+  }
+]
+```
+🧭 What Happens Here?
+- Navigating to /admin → loads DashboardComponent.
+- Navigating to /admin/users → loads UsersComponent.
+
+---
+## Router Outlet
+
+❓ What is <router-outlet>?
+- A directive provided by Angular's RouterModule.
+- Acts as a placeholder in your component's template.
+- Tells Angular where to display routed components.
+
+📦 Without <router-outlet>, routes won't render
+- Angular matches the URL to a route.
+- But unless there's a <router-outlet>, there’s no place to inject the component.
+
+Example:
+``` html
+<!--app.component.html-->
+<app-menu class="sticky-top"> </app-menu>
+<app-header> </app-header>
+<router-outlet></router-outlet>
+<app-footer> </app-footer>
+```
+
+---
+
+## Angular navigation
+
+#### Template-based: routerLink
+```html
+<button [routerLink]="['/dashboard']">Go to Dashboard</button>
+...
+<a [routerLink]="['/user', 42]">View User #42</a>
+```
+- Simple, declarative navigation
+- Static routes defined in the template
+
+#### Programmatic: Router Service
+```ts
+router = inject(Router)
+goToDashboard() {
+  this.router.navigate(['/dashboard']);
+}
+goToUser(id: number) {
+  this.router.navigate(['/user', id]);
+}
+```
+- Can define conditional logic before navigation
+- Can add dynamic parameters or navigation after async events
+
+---
+## Fetching route parameters
+
+As we used component input binding, we can fetch the url params as inputs
+
+```ts
+id = input.required<string>()
+```
+
+
+Other version, using ActivatedRoute service:
+
+```ts
+route = inject(ActivatedRoute);
+// Signal for route param `id`
+id = computed(() => this.route.snapshot.paramMap.get('id'));
+```
+
+Observable based approach:
+```ts
+id = signal<string | null>(null);
+
+this.route.paramMap.subscribe(map => {
+  id.set(map.get('id'));
+});
+```
+
+
+
+---
+.red.bold[*Ex.6.1:] Add a stores section
+
+- Create a new feature-store-list component and feature-store-details component
+- Create a new store service, which reads stores from  http://localhost:3000/api/stores
+- Use the existing store-list-entry component to display stores in the list and store-details-card component to display store details
+- Create the routing configuration: /pizzas should load PizzaContainerComponent, /stores should load Stores list and /stores/:id should load store details component
+- Add router-outlet properly to render the pizzas/stores details
+- In store details component, Fetch the ID from the URL
+- Fetch the store details based on the ID  from the backend (using GET on /api/stores/:id )
+
+---
+class: center, middle,inverse
+
+# Lazy Loading
+
+---
+
+## Optimizing app performance with route based lazy loading
+
+#### Key Benefits:
+- Smaller initial bundle
+- Faster app startup
+- Load routes only when needed
+
+#### Two Lazy Loading Methods
+
+1. **loadChildren** — Lazy load a feature route (route group)
+2. **loadComponent** — Lazy load a single component
+
+✅ Both work with standalone components
+
+✅ Choose based on complexity of the route
+
+
+---
+
+## Lazy Load a Component
+
+```ts
+//app.routes.ts
+export const routes: Routes = [
+  {
+    path: '',
+    loadComponent: () =>
+      import('./home/home.component').then(m => m.HomeComponent),
+  },
+  {
+    path: 'about',
+    loadComponent: () =>
+      import('./about/about.component').then(m => m.AboutComponent),
+  },
+];
+```
+---
+
+## Lazy Load a Route Group (loadChildren)
+
+``` ts
+// app.routes.ts
+export const routes: Routes = [
+  {
+    path: 'settings',
+    loadChildren: () =>
+      import('./settings/settings.routes').then(m => m.settingsRoutes),
+  },
+];
+```
+
+```ts
+// settings.routes.ts
+export const settingsRoutes: Routes = [
+  {
+    path: '',
+    component: SettingsComponent,
+  },
+];
+```
+
+---
+
+.red.bold[*Ex.6.2:] Change routing to use lazy loading
+
+- Move stores related routing to a different stores.routes.ts
+- Lazy load both stores and pizzas related routes, using both methods
+
+---
+class: center, middle,inverse
+
+# Guards
+
+---
+
+## Route Guards in Angular
+### Control access to Routes
+
+#### Purpose of Guards
+- Protect routes from unauthorized access
+- Perform checks *before* entering a route
+- Optionally redirect users
+
+#### Common Use Cases for Guards
+- Protect routes behind authentication
+- Redirect unauthenticated users
+- Block access to routes for logged-in users (e.g. login page)
+- Ask before navigating away (unsaved changes)
+
+---
+
+## Types of Route Guards
+
+### Built-in Guard Types
+
+| Guard              | When It Runs                    |
+|--------------------|---------------------------------|
+| `canActivate`      | Before entering a route         |
+| `canMatch`         | Before matching the route path  |
+| `canDeactivate`    | Before leaving a component      |
+| `canLoad`          | Before loading a lazy module    |
+
+✅ Most common: `canActivate`, `canMatch`
+
+---
+
+## Creating a Simple Guard
+
+```bash
+ng generate guard auth
+```
+
+```ts
+// auth.guard.ts
+import { inject } from '@angular/core';
+import { CanActivateFn } from '@angular/router';
+import { AuthService } from './auth.service';
+
+export const authGuard: CanActivateFn = (route, state) => {
+  const auth = inject(AuthService);
+  return auth.isLoggedIn(); // returns boolean or Observable<boolean>
+};
+```
+✅ A guard is just a function in modern Angular — no class needed!
+
+---
+
+## Using a Guard in a Route
+
+```ts
+// app.routes.ts
+export const routes: Routes = [
+  {
+    path: 'dashboard',
+    loadComponent: () =>
+      import('./dashboard/dashboard.component').then(m => m.DashboardComponent),
+    canActivate: [authGuard],
+  },
+];
+```
+
+---
+
+## Redirecting in Guards
+
+```ts
+// auth.guard.ts
+import { inject } from '@angular/core';
+import { Router } from '@angular/router';
+
+export const authGuard: CanActivateFn = () => {
+  const auth = inject(AuthService);
+  const router = inject(Router);
+
+  if (!auth.isLoggedIn()) {
+    return router.createUrlTree(['/login']);
+  }
+
+  return true;
+};
+```
+
+.footnote[*Using createUrlTree() here is preferable over navigate(), as it will override the current navigation instead of triggering a new one*]
+
+---
+
+## Async Guards
+
+#### An auth result might come from an API call to the backend
+```ts
+// auth.service.ts
+isLoggedIn(): Observable<boolean> {
+  return this.http.get<boolean>('/api/auth/status');
+}
+```
+
+#### Guards work the same with observables
+```ts
+// auth.guard.ts
+export const authGuard: CanActivateFn = () => {
+  const auth = inject(AuthService);
+  const router = inject(Router);
+
+  return auth.isLoggedIn().pipe(
+    map(isLoggedIn => isLoggedIn ? true : router.createUrlTree(['/login']))
+  );
+};
+```
+
+---
+
+.red.bold[*Ex.6.3:] Add a guard to the stores components
+
+- Create an auth service with an isLoggedIn() method, that will initially return true
+- Create an auth guard that will use the new service and add it to the routing configuration of the stores components
+- Create an unauthorized component with a simple message, add it to the routing configuration and redirect to it from the auth guard
+- Switch the auth service to integrate with our backend: /api/auth (you can try out returning something else from the backend to observe behavior)
+
+
+
+    </textarea>
+<script src="../src/remark-latest.min.js">
+</script>
+<script>
+    var slideshow = remark.create({
+        ratio: '16:9'
+    });
+</script>
+</body>
+</html>
