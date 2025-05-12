@@ -153,14 +153,14 @@ const appRoutes: Routes = [
 ---
 ## Router Outlet
 
-❓ What is router-outlet ?
+❓ What is "router-outlet" ?
 - A directive provided by Angular's RouterModule.
 - Acts as a placeholder in your component's template.
 - Tells Angular where to display routed components.
 
-📦 Without <router-outlet>, routes won't render
+📦 Without "router-outlet", routes won't render
 - Angular matches the URL to a route.
-- But unless there's a <router-outlet>, there’s no place to inject the component.
+- But unless there's a "router-outlet", there’s no place to inject the component.
 
 Example:
 ``` html
@@ -236,6 +236,7 @@ this.route.paramMap.subscribe(map => {
 - Add router-outlet properly to render the pizzas/stores details
 - In store details component, Fetch the ID from the URL
 - Fetch the store details based on the ID  from the backend (using GET on /api/stores/:id )
+- Add navigation: clicking on the store image in the list should navigate to details
 
 ---
 class: center, middle,inverse
