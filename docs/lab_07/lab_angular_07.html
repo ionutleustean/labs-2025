@@ -248,12 +248,12 @@ Structural directives are Angular directives that change the structure of the DO
   selector: '[appShow]',
 })
 export class ShowDirective {
-  condition = input<Signal<boolean>>('appShow');
+  condition = input<boolean>();
   constructor(
     private templateRef: TemplateRef<unknown>, private viewContainer: ViewContainerRef
   ) {
     effect(() => {
-      const shouldShow = this.condition()?.();
+      const shouldShow = this.condition();
       this.viewContainer.clear();
       if (shouldShow) {
         this.viewContainer.createEmbeddedView(this.templateRef);
@@ -289,7 +289,7 @@ export class ShowDirective {
 
 - Create a pipe to be applied on the pizza description that removes any occurrence of the word 'pineapple' and replaces it with '[REDACTED]'
 - Create a directive that would make change the background color of the delete button (pizza-card) to red on hover
-- Create an "appAutoFocus" directive to be applied to the Name field in the pizza form, that will make it so that the input will be in focus on load ( element.nativeElement.focus() )
+- Create an "appAutoFocus" directive to be applied to the Name field in the pizza form, that will make it so that the input will be in focus on load when adding a new pizza ( element.nativeElement.focus() )
 - Create an "appIfPermission" directive that uses the auth service to hide the delete button if the user is not logged in
 
 ---
@@ -381,6 +381,18 @@ Offers:
 - Cell templates for full flexibility
 
 Ideal for structured datasets like lists of users, orders, records, etc.
+
+```ts
+@Component({
+  selector: 'app-pizza-list',
+  templateUrl: './pizza-list.component.html',
+  imports: [
+    MatTableModule
+  ],
+  styleUrl: './pizza-list.component.scss'
+})
+
+```
 
 ---
 
