@@ -116,6 +116,57 @@ let stores = [
   }
 ];
 
+let customers = [
+  {
+    id: 'c1',
+    firstName: 'Mihai',
+    lastName: 'Vulpe',
+    age: 31,
+    city: 'Timisoara',
+    country: 'Romania'
+  },
+  {
+    id: 'c2',
+    firstName: 'John',
+    lastName: 'Doe',
+    age: 24,
+    city: 'London',
+    country: 'United Kingdom'
+  },
+  {
+    id: 'c3',
+    firstName: 'Vivian',
+    lastName: 'Wehrle',
+    age: 29,
+    city: 'Zurich',
+    country: 'Switzerland'
+  },
+  {
+    id: 'c4',
+    firstName: 'Luis',
+    lastName: 'Fernandez',
+    age: 45,
+    city: 'Lisbon',
+    country: 'Portugal'
+  },
+  {
+    id: 'c5',
+    firstName: 'Jyoti',
+    lastName: 'Verma',
+    age: 30,
+    city: 'Mumbai',
+    country: 'India'
+  },
+  {
+    id: 'c6',
+    firstName: 'Giorgios',
+    lastName: 'Marinakis',
+    age: 55,
+    city: 'Athens',
+    country: 'Greece'
+  },
+];
+
 app.get('/api/pizzas', (req, res) => {
   res.json(pizzas)
 })
@@ -124,10 +175,20 @@ app.get('/api/stores', (req, res) => {
   res.json(stores)
 })
 
+app.get('/api/customers', (req, res) => {
+  res.json(customers)
+})
+
 app.get('/api/stores/:id', (req, res) => {
   const id = req.params['id']
   const aStore = stores.find(item => item.id === id)
   res.json(aStore)
+})
+
+app.get('/api/customers/:id', (req, res) => {
+  const id = req.params['id']
+  const aCustomer = customers.find(item => item.id === id)
+  res.json(aCustomer)
 })
 
 app.get('/api/auth', (req, res) => {
@@ -154,6 +215,27 @@ app.post('/api/pizzas', (req, res) => {
 
   // Send back the newly added pizza
   res.status(201).json(newPizza)
+})
+
+app.post('/api/customers', (req, res) => {
+  const {id, firstName, lastName, age, city, country} = req.body
+
+  if (!firstName || !lastName) {
+    return res.status(400).json({message: 'First Name and Last Name are required.'})
+  }
+
+  const tempCustomers = [...customers];
+  const index = tempCustomers.findIndex(p => p.id === id)
+
+  const newCustomer = {id, firstName, lastName, age, city, country}
+  if (index !== -1) {
+    tempCustomers[index] = newCustomer
+    customers = tempCustomers
+  } else {
+    return res.status(400).json({message: 'No customer found with this ID.'})
+  }
+
+  res.status(201).json(newCustomer)
 })
 
 app.delete('/api/pizzas/:id', (req, res) => {

@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>lab_07</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="../src/style.css">
+</head>
+<body>
+<textarea id="source">
+
+class: center, middle, inverse
+
+# Angular Pipes and Directives
+
+---
+### Angular Pipes
+
+- A pipe is a way to transform values in the template.
+- Are used through the  |  symbol
+
+```html
+{{ value | pipeName }}
+```
+
+- Pipes are pure functions – they don’t change the original value.
+
+You can also chain pipes:
+```html
+{{ name | lowercase | slice:0:3 }}
+```
+
+Common built-in Pipes:
+.left-column[
+- date
+```html
+{{ today | date }}
+Output: Apr 25, 2025
+```
+- uppercase/lowercase
+```html
+{{ 'hello' | uppercase }}
+Output: HELLO
+```
+]
+.right-column[
+- currency
+```html
+{{ 99.99 | currency }}
+Output: $99.99 (depending on locale)
+```
+- slice
+```html
+{{ 'Angular' | slice:1:4 }}
+Output: ngu
+```
+]
+
+
+
+---
+## Creating a pipe
+
+```bash
+ng generate pipe trademark
+```
+
+```ts
+import { Pipe, PipeTransform } from '@angular/core';
+
+@Pipe({ name: 'trademark' })
+export class TrademarkPipe implements PipeTransform {
+  transform(value: string): string {
+    return value + '™';
+  }
+}
+```
+
+Usage in template:
+```html
+<p>{{ 'Angular' | trademark }}</p>
+Output: Angular™
+```
+
+---
+## RxJS pipes
+
+- Used in observables to compose operators
+- Allows chaining async transformation
+
+Syntax:
+
+```ts
+someObservable.pipe(
+  map(x => x * 2),
+  filter(x => x % 3 === 0)
+)
+```
+
+
+---
+
+## Angular directives
+
+What is a Directive?
+- A directive is a class that adds behavior to elements in Angular templates
+- Think of it as a way to extend HTML
+- Reusable across components
+
+Three Main Types of Directives
+1. Component – a directive with a template (you already use these!)
+2. Attribute Directive – changes the appearance or behavior of an element
+3. Structural Directive – changes the layout by adding/removing elements
+
+
+```bash
+ng generate directive example
+```
+
+---
+## Attribute directives
+
+Attribute directives change appearance or behavior of an element.
+
+  🧩 What Complex Problems Can Attribute Directives Solve?
+- Form enhancements: auto-focusing, validation hints, real-time formatting (e.g. credit card number formatting)
+- UI behavior hooks: custom tooltips, auto-resizing text areas, theme toggling
+- Event coordination: managing drag-and-drop zones, keyboard shortcuts
+- Accessibility: dynamically applying ARIA attributes or roles
+- Animation triggers: attach class changes or styles on interaction or viewport visibility
+
+
+####Built-in examples:
+```html
+<div [ngClass]="{ active: isActive }"></div>
+
+<div [ngStyle]="{ color: 'red' }"></div>
+```
+
+---
+
+Custom attribute directive:
+```ts
+@Directive({
+  selector: '[appHighlight]'
+})
+export class HighlightDirective {
+  color = input<string>('appHighlight');
+  constructor(private el: ElementRef) {
+    effect(() => {
+        this.el.nativeElement.style.backgroundColor = this.color()
+    });
+  }
+}
+```
+
+Usage:
+```html
+<p [appHighlight]="'lightblue'">This is highlighted</p>
+```
+
+
+---
+
+##Handling events:
+What if we want a directive that handles certain events?
+
+@HostListener('eventName') binds a method to a DOM event on the host element.
+
+
+```ts
+@Directive({
+  selector: '[appHoverHighlight]'
+})
+export class HoverHighlightDirective {
+  hoverColor = input.required<string>('appHoverHighlight');
+  private backgroundColor = signal<string | null>(null);
+  constructor(private el: ElementRef) {
+    effect(() => {
+        this.el.nativeElement.style.backgroundColor = this.backgroundColor()
+    })
+  }
+  @HostListener('mouseenter') onMouseEnter() {
+    this.backgroundColor.set(this.hoverColor());
+  }
+  @HostListener('mouseleave') onMouseLeave() {
+    this.backgroundColor.set(null);
+  }
+}
+```
+
+```html
+<p [appHoverHighlight]="'lightgreen'">Hover here.</p>
+```
+
+---
+
+## More complex attribute directive: appAutoFocusInvalid
+
+When submitting a form, we often want to automatically focus the first invalid input, especially for accessibility and UX reasons. This directive finds the first invalid control and focuses it.
+
+```ts
+@Directive({
+  selector: '[appAutoFocusInvalid]'
+})
+export class AutoFocusInvalidDirective {
+  constructor(private formRef: ElementRef) {}
+  @Input() set appAutoFocusInvalid(form: NgForm) {
+    if (!form) return;
+    setTimeout(() => {
+      const invalidControl = this.formRef.nativeElement.querySelector('.ng-invalid');
+      if (invalidControl) {
+        invalidControl.focus();
+      }
+    });
+  }
+}
+```
+```html
+<form #form="ngForm" [appAutoFocusInvalid]="form" (ngSubmit)="submitForm(form)">
+  <input name="email" ngModel required />
+  <input name="password" ngModel required minlength="6" />
+  <button type="submit">Submit</button>
+</form>
+```
+
+---
+## Structural directives
+
+Structural directives are Angular directives that change the structure of the DOM — i.e., they add or remove elements dynamically based on some condition.
+- They typically use the * prefix (syntactic sugar).
+- They manipulate the DOM via <ng-template> under the hood
+
+####Common built-in examples:
+
+| Directive   | What it does                         |
+| ----------- | ------------------------------------ |
+| `*ngIf`     | Conditionally includes a template    |
+| `*ngFor`    | Iterates over a list                 |
+| `*ngSwitch` | Conditionally switches between views |
+
+
+---
+
+## Structural directive example
+
+```ts
+@Directive({
+  selector: '[appShow]',
+})
+export class ShowDirective {
+  condition = input<Signal<boolean>>('appShow');
+  constructor(
+    private templateRef: TemplateRef<unknown>, private viewContainer: ViewContainerRef
+  ) {
+    effect(() => {
+      const shouldShow = this.condition()?.();
+      this.viewContainer.clear();
+      if (shouldShow) {
+        this.viewContainer.createEmbeddedView(this.templateRef);
+      }
+    });
+  }
+}
+```
+
+```html
+<div *appShow="isVisible">
+  This content is shown or hidden using a signal! (isVisible is a boolean signal)
+</div>
+```
+
+---
+## What problems can be solved with structural directives?
+
+- Conditional rendering with permissions:
+```html
+<button *appHasPermission="'admin'">Delete User</button>
+```
+- Render based on feature flags:
+```html
+<div *appFeatureFlag="'newDashboard'">New dashboard view</div>
+```
+- Custom layout projections: Repeat a block and alternate content based on data (e.g. grid layout, carousel step).
+
+
+
+---
+.red.bold[*Ex.7.1:] Adding pipes and directives
+
+- Create a pipe to be applied on the pizza description that removes any occurrence of the word 'pineapple' and replaces it with '[REDACTED]'
+- Create a directive that would make change the background color of the delete button (pizza-card) to red on hover
+- Create an "appAutoFocus" directive to be applied to the Name field in the pizza form, that will make it so that the input will be in focus on load ( element.nativeElement.focus() )
+- Create an "appIfPermission" directive that uses the auth service to hide the delete button if the user is not logged in
+
+---
+class: center, middle,inverse
+
+# Angular component libraries
+# Angular Material
+
+---
+
+## Component Libraries intro
+
+Component libraries are collections of reusable UI components (e.g. buttons, inputs, dialogs) built to work within a framework like Angular.
+#### Key Features:
+- Pre-built components with consistent look & behavior
+- Encapsulated logic, styles, accessibility
+- Save time and effort — no need to build everything from scratch
+
+#### Benefits:
+✅ Faster Development
+➡️ Drop in pre-built components instead of hand-coding them.
+
+✅ Design Consistency
+➡️ Use a standardized UI system across your app.
+
+✅ Accessibility
+➡️ Libraries like Angular Material follow WCAG & ARIA best practices.
+
+✅ Responsiveness
+➡️ Many libraries are mobile-first or responsive out-of-the-box.
+
+✅ Integration with Angular
+➡️ Seamless binding, forms, theming, animations, DI, etc.
+
+---
+
+## Popular Angular Component Libraries
+
+| Library                       | Description                                                                 |
+| ----------------------------- | --------------------------------------------------------------------------- |
+| **Angular Material**          | Official Google-backed UI toolkit. Implements Material Design.              |
+| **PrimeNG**                   | Large suite of customizable components. Supports themes and templates.      |
+| **ngx-bootstrap**             | Bootstrap-based components with Angular support. Great for legacy projects. |
+|                               |                                                                             |
+| **Carbon Components Angular** | IBM’s design system for Angular. Consistent with Carbon Design.             |
+| **Nebular**                   | Modular, customizable components with themes, icons, auth support.          |
+| **Clarity**                   | VMware's design system. Focuses on UX, accessibility, and data-rich apps.   |
+| **Tailwind + Headless UI**    | Use Tailwind CSS + logic-only components (not visual). Very flexible.       |
+| **NG-ZORRO**                  | Based on Ant Design, popular in enterprise apps. Fully-featured & styled.   |
+| **Kendo UI for Angular**      | Commercial library with enterprise-grade components & charts.               |
+
+
+---
+
+## Why Angular Material?
+
+- Developed & maintained by the Angular team
+- Implements Google's Material Design system
+- Tight integration with:
+    - Angular Forms
+    - Angular CDK (Component Dev Kit)
+    - Animations
+    - Theming and Accessibility
+
+### Installing Angular Material
+
+```bash
+ng add @angular/material
+```
+
+You’ll be prompted to:
+- Choose a theme
+- Enable global typography styles
+- Enable animations
+
+This sets up everything you need (theme, styles, modules, dependencies).
+
+---
+
+## Material Table
+
+What is mat-table?
+- A configurable data table from Angular Material.
+- Built on the Angular CDK.
+
+Offers:
+- Customizable columns
+- Integration with sorting, filtering, pagination
+- Cell templates for full flexibility
+
+Ideal for structured datasets like lists of users, orders, records, etc.
+
+---
+
+## Material Table Example
+
+```html
+<mat-table [dataSource]="data()" class="mat-elevation-z8">
+
+  <!-- ID Column -->
+  <ng-container matColumnDef="id">
+    <mat-header-cell *matHeaderCellDef> ID </mat-header-cell>
+    <mat-cell *matCellDef="let element"> {{ element.id }} </mat-cell>
+  </ng-container>
+
+  <!-- Name Column -->
+  <ng-container matColumnDef="name">
+    <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
+    <mat-cell *matCellDef="let element"> {{ element.name }} </mat-cell>
+  </ng-container>
+
+  <!-- Header and Row Definitions -->
+  <mat-header-row *matHeaderRowDef="columns"></mat-header-row>
+  <mat-row *matRowDef="let row; columns: columns"></mat-row>
+
+</mat-table>
+```
+
+---
+
+## Material Table Example
+
+```ts
+export class MyTableComponent {
+  private readonly items = signal([
+    { id: 1, name: 'Alice' },
+    { id: 2, name: 'Bob' },
+    { id: 3, name: 'Charlie' },
+  ]);
+
+  // Expose dataSource to template
+  readonly data = computed(() => this.items());
+
+  // Columns to render
+  readonly columns = ['id', 'name'];
+```
+
+---
+
+## Material Table: Sorting + Pagination
+
+```html
+<mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
+
+  <ng-container matColumnDef="id">
+    <mat-header-cell *matHeaderCellDef mat-sort-header> ID </mat-header-cell>
+    <mat-cell *matCellDef="let element"> {{ element.id }} </mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="name">
+    <mat-header-cell *matHeaderCellDef mat-sort-header> Name </mat-header-cell>
+    <mat-cell *matCellDef="let element"> {{ element.name }} </mat-cell>
+  </ng-container>
+
+  <mat-header-row *matHeaderRowDef="columns"></mat-header-row>
+  <mat-row *matRowDef="let row; columns: columns"></mat-row>
+</mat-table>
+<mat-paginator [pageSize]="2" [pageSizeOptions]="[2, 5, 10]"></mat-paginator>
+```
+
+---
+
+## Material Table: Sorting + Pagination
+
+```ts
+export class MyTableComponent implements AfterViewInit{
+  @ViewChild(MatSort) sort!: MatSort;
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+
+  private readonly items = signal([
+    { id: 1, name: 'Alice' },
+    { id: 2, name: 'Bob' },
+    { id: 3, name: 'Charlie' },
+  ]);
+
+  readonly dataSource = new MatTableDataSource<{ id: number; name: string }>();
+
+  // Columns to render
+  readonly columns = ['id', 'name'];
+
+  constructor() { // Effect to update table when data changes
+    effect(() => {
+      this.dataSource.data = this.items();
+    });
+  }
+
+  ngAfterViewInit() {
+    this.dataSource.sort = this.sort;
+    this.dataSource.paginator = this.paginator;
+  }
+```
+
+---
+
+## Material Buttons & Icons
+
+```html
+  <!-- Action Column -->
+  <ng-container matColumnDef="actions">
+    <mat-header-cell *matHeaderCellDef> Actions </mat-header-cell>
+    <mat-cell *matCellDef="let row">
+      <button mat-icon-button (click)="edit(row)">
+        <mat-icon>edit</mat-icon>
+      </button>
+    </mat-cell>
+  </ng-container>
+```
+
+---
+
+.red.bold[*Ex.7.2:] Add an Angular Material Table
+
+- Import angular material into the project
+- In the new Customers list component, add a table using Angular Material
+- Add Sorting, pagination and a button that navigates to details page for each customer.
+
+---
+
+## Form Fields
+
+What is `<mat-form-field>`?
+- A wrapper component that provides Material styling and layout for form controls
+
+Handles:
+- Label floating
+- Hints
+- Error messages
+- Icons and prefixes
+- Responsive layout
+
+Always wrap inputs and other form controls in  `<mat-form-field>`
+
+```html
+<mat-form-field appearance="fill">
+  <mat-label>Name</mat-label>
+  <input matInput [ngModel]="name" (ngModelChange)="nameChanged($event)" #nameControl="ngModel">
+
+  @if (nameControl.errors && nameControl.errors['required']) {
+    <mat-error>Name is required.</mat-error>
+  }
+</mat-form-field>
+```
+---
+
+## Material Select (dropdown)
+
+```html
+<mat-form-field appearance="fill">
+  <mat-label>Favorite Animal</mat-label>
+  <mat-select [value]="selectedAnimal()" (valueChange)="selectedAnimal.set($event)">
+    <mat-option *ngFor="let animal of animals" [value]="animal">
+      {{ animal }}
+    </mat-option>
+  </mat-select>
+</mat-form-field>
+```
+
+---
+
+## Material Autocomplete
+
+```html
+<mat-form-field appearance="fill">
+  <mat-label>Search Animal</mat-label>
+  <input
+    type="text"
+    matInput
+    [matAutocomplete]="auto"
+    [ngModel]="searchTerm()"
+    (ngModelChange)="searchTerm.set($event)" />
+
+  <mat-autocomplete #auto="matAutocomplete">
+    <mat-option *ngFor="let animal of filteredAnimals()" [value]="animal">
+      {{ animal }}
+    </mat-option>
+  </mat-autocomplete>
+</mat-form-field>
+```
+
+---
+
+## Material Autocomplete
+
+```ts
+export class AutocompleteComponent {
+  readonly animals = ['Dog', 'Cat', 'Parrot', 'Panda', 'Dolphin'];
+
+  readonly searchTerm = signal('');
+
+  readonly filteredAnimals = computed(() => {
+    const term = this.searchTerm().toLowerCase();
+    return this.animals.filter(a => a.toLowerCase().includes(term));
+  });
+}
+```
+
+---
+
+.red.bold[*Ex.7.3:] Update the customer details component form to use material based inputs
+
+- Wrap all the form elements in mat-form-field
+- Add mat-input for firstName and lastName
+- Add a dropdown for countries and an autocomplete for cities
+
+
+
+    </textarea>
+<script src="../src/remark-latest.min.js">
+</script>
+<script>
+    var slideshow = remark.create({
+        ratio: '16:9'
+    });
+</script>
+</body>
+</html>
