@@ -144,7 +144,7 @@ Custom attribute directive:
   selector: '[appHighlight]'
 })
 export class HighlightDirective {
-  color = input<string>('appHighlight');
+  color = input<string>();
   constructor(private el: ElementRef) {
     effect(() => {
         this.el.nativeElement.style.backgroundColor = this.color()
@@ -172,7 +172,7 @@ What if we want a directive that handles certain events?
   selector: '[appHoverHighlight]'
 })
 export class HoverHighlightDirective {
-  hoverColor = input.required<string>('appHoverHighlight');
+  hoverColor = input.required<string>();
   private backgroundColor = signal<string | null>(null);
   constructor(private el: ElementRef) {
     effect(() => {
