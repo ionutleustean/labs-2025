@@ -1,0 +1,20 @@
+<div id="customers" class="container my-5">
+
+  <h2> Our Customers </h2>
+
+  <div class="d-flex flex-wrap">
+    @for (customer of customers(); track customer.id) {
+      <div class="m-2" style="width: 30%" (click)="goToDetails(customer)">
+        <div class="p-2 border rounded mb-2" style="min-height: 80px;">
+          <div class="fw-bold fs-5 text-truncate">
+            {{ customer.firstName }} {{customer.lastName}} ({{customer.age}})
+          </div>
+          <div class="fw-bold fs-5 text-truncate">
+            {{ customer.city }}, {{customer.country}}
+          </div>
+        </div>
+
+      </div>
+    }
+  </div>
+</div>
