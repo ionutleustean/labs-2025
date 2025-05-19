@@ -144,7 +144,7 @@ Custom attribute directive:
   selector: '[appHighlight]'
 })
 export class HighlightDirective {
-  color = input<string>();
+  appHighlight = input<string>();
   constructor(private el: ElementRef) {
     effect(() => {
         this.el.nativeElement.style.backgroundColor = this.color()
@@ -189,7 +189,7 @@ export class HoverHighlightDirective {
 ```
 
 ```html
-<p [appHoverHighlight]="'lightgreen'">Hover here.</p>
+<p appHoverHighlight [hoverColor]="'lightgreen'">Hover here.</p>
 ```
 
 ---
