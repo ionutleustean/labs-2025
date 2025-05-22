@@ -4117,6 +4117,7 @@
               }
             ],
             "styles": [
+              "@angular/material/prebuilt-themes/azure-blue.css",
               "projects/lab_7_3_completed/src/styles.scss"
             ],
             "scripts": []
@@ -4176,6 +4177,7 @@
               }
             ],
             "styles": [
+              "@angular/material/prebuilt-themes/azure-blue.css",
               "projects/lab_7_3_completed/src/styles.scss"
             ],
             "scripts": []
