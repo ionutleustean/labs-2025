@@ -2,95 +2,23 @@ import express from 'express'
 import bodyParser from 'express'
 import cors from 'cors'
 
+import pizzas_data from './pizza.data.js';
+import burgers_data from "./burgers.data.js";
+import pastas_data from "./pasta.data.js";
+
+let pizzas = [...pizzas_data];
+let burgers = [...burgers_data];
+let pastas = [...pastas_data];
+
 const app = express()
 const PORT = 3000
 
 app.use(cors()) // allow requests from Angular app
 app.use(bodyParser.json()) // To parse JSON request bodies
 
-let pizzas = [
-  {
-    id: 'pizza_0_0',
-    imageUrl: '/pizzas/pizza_0_0.png',
-    name: 'Margherita',
-    description: 'Classic pizza with tomato sauce and mozzarella cheese.',
-    price: 8.99,
-    ingredients: ['Tomato Sauce', 'Mozzarella Cheese', 'Basil'],
-    hotness: 0
-  },
-  {
-    id: 'pizza_0_1',
-    imageUrl: '/pizzas/pizza_0_1.png',
-    name: 'Pepperoni',
-    description: 'Spicy pepperoni with mozzarella cheese and tomato sauce.',
-    price: 9.99,
-    ingredients: ['Tomato Sauce', 'Mozzarella Cheese', 'Pepperoni'],
-    hotness: 4
-  },
-  {
-    id: 'pizza_0_2',
-    imageUrl: '/pizzas/pizza_0_2.png',
-    name: 'Vegetarian',
-    description: 'Loaded with fresh vegetables and mozzarella cheese.',
-    price: 10.49,
-    ingredients: ['Tomato Sauce', 'Mozzarella Cheese', 'Bell Peppers', 'Olives', 'Onions'],
-    hotness: 0
-  },
-  {
-    id: 'pizza_1_0',
-    imageUrl: '/pizzas/pizza_1_0.png',
-    name: 'BBQ Chicken',
-    description: 'Grilled chicken with BBQ sauce and red onions.',
-    price: 11.49,
-    ingredients: ['BBQ Sauce', 'Mozzarella Cheese', 'Grilled Chicken', 'Red Onions'],
-    hotness: 2
-  },
-  {
-    id: 'pizza_1_1',
-    imageUrl: '/pizzas/pizza_1_1.png',
-    name: 'Hawaiian',
-    description: 'Ham and pineapple on a classic pizza base.',
-    price: 10.99,
-    ingredients: ['Tomato Sauce', 'Mozzarella Cheese', 'Ham', 'Pineapple'],
-    hotness: 1
-  },
-  {
-    id: 'pizza_1_2',
-    imageUrl: '/pizzas/pizza_1_2.png',
-    name: 'Meat Lovers',
-    description: 'A carnivore\'s dream with various meats and cheese.',
-    price: 12.99,
-    ingredients: ['Tomato Sauce', 'Mozzarella Cheese', 'Pepperoni', 'Sausage', 'Bacon'],
-    hotness: 3
-  },
-  {
-    id: 'pizza_2_0',
-    imageUrl: '/pizzas/pizza_2_0.png',
-    name: 'Buffalo Chicken',
-    description: 'Spicy buffalo chicken with blue cheese dressing.',
-    price: 11.99,
-    ingredients: ['Buffalo Sauce', 'Mozzarella Cheese', 'Grilled Chicken', 'Blue Cheese'],
-    hotness: 1
-  },
-  {
-    id: 'pizza_2_1',
-    imageUrl: '/pizzas/pizza_2_1.png',
-    name: 'Four Cheese',
-    description: 'A blend of four delicious cheeses on a crispy crust.',
-    price: 10.99,
-    ingredients: ['Tomato Sauce', 'Mozzarella Cheese', 'Parmesan', 'Gorgonzola', 'Ricotta'],
-    hotness: 0
-  },
-  {
-    id: 'pizza_2_2',
-    imageUrl: '/pizzas/pizza_2_2.png',
-    name: 'Pesto Veggie',
-    description: 'Fresh vegetables with pesto sauce and mozzarella cheese.',
-    price: 10.49,
-    ingredients: ['Pesto Sauce', 'Mozzarella Cheese', 'Zucchini', 'Spinach', 'Feta Cheese'],
-    hotness: 0
-  },
-];
+app.set('query parser', 'extended');
+
+
 
 let stores = [
   {
@@ -244,6 +172,106 @@ app.delete('/api/pizzas/:id', (req, res) => {
   // Send back the newly added pizza
   res.status(201).json("deleted successfully!")
 })
+
+
+
+app.get('/api/filtered_pizza', (req, res) => {
+  const filters = [];
+  for (const [field, ops] of Object.entries(req.query)) {
+    if (ops && typeof ops === 'object') {
+      for (const op of ['like', 'equal']) {
+        if (ops[op] != null) {
+          filters.push(makePredicate(field, op, ops[op]));
+        }
+      }
+    }
+  }
+  for (const key of Object.keys(req.query)) {
+    const m = key.match(/^(\w+)\[(like|equal)\]$/);
+    if (m) {
+      const [, field, op] = m;
+      filters.push(makePredicate(field, op, req.query[key]));
+    }
+  }
+  const result = filters.length
+    ? pizzas.filter(item => filters.every(fn => fn(item)))
+    : pizzas;
+
+  res.json(result);
+});
+
+
+
+app.get('/api/filtered_burgers', (req, res) => {
+  const filters = [];
+  for (const [field, ops] of Object.entries(req.query)) {
+    if (ops && typeof ops === 'object') {
+      for (const op of ['like', 'equal']) {
+        if (ops[op] != null) {
+          filters.push(makePredicate(field, op, ops[op]));
+        }
+      }
+    }
+  }
+  for (const key of Object.keys(req.query)) {
+    const m = key.match(/^(\w+)\[(like|equal)\]$/);
+    if (m) {
+      const [, field, op] = m;
+      filters.push(makePredicate(field, op, req.query[key]));
+    }
+  }
+  const result = filters.length
+    ? burgers.filter(item => filters.every(fn => fn(item)))
+    : burgers;
+
+  res.json(result);
+});
+
+app.get('/api/filtered_pastas', (req, res) => {
+  const filters = [];
+  for (const [field, ops] of Object.entries(req.query)) {
+    if (ops && typeof ops === 'object') {
+      for (const op of ['like', 'equal']) {
+        if (ops[op] != null) {
+          filters.push(makePredicate(field, op, ops[op]));
+        }
+      }
+    }
+  }
+  for (const key of Object.keys(req.query)) {
+    const m = key.match(/^(\w+)\[(like|equal)\]$/);
+    if (m) {
+      const [, field, op] = m;
+      filters.push(makePredicate(field, op, req.query[key]));
+    }
+  }
+  const result = filters.length
+    ? pastas.filter(item => filters.every(fn => fn(item)))
+    : pastas;
+
+  res.json(result);
+});
+
+function makePredicate(field, op, rawValue) {
+  return item => {
+    const val = item[field];
+    if (val == null) return false;
+    const str = val.toString();
+    if (op === 'like') {
+      // case‐insensitive substring
+      return str.toLowerCase().includes(rawValue.toLowerCase());
+    } else {
+      // equal: numeric if original is number, otherwise string‐compare
+      if (typeof val === 'number') {
+        return val === Number(rawValue);
+      }
+      return str.toLowerCase() === rawValue.toLowerCase();
+    }
+  };
+}
+
+
+
 
 
 app.listen(PORT, () => {

@@ -47,6 +47,7 @@
     "start_lab_7_2_completed": "ng serve lab_7_1_completed --port=4242",
     "start_lab_7_3": "ng serve lab_7_3 --port=4243",
     "start_lab_7_3_completed": "ng serve lab_7_3_completed --port=4244",
+    "start_lab_8_1": "ng serve lab_8_1 --port=4245",
     "start_backend": "node server/server.js",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",

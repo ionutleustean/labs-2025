@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>lab_07</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="../src/style.css">
+</head>
+<body>
+<textarea id="source">
+
+class: center, middle, inverse
+
+# State Management in Angular
+
+---
+### What is state?
+
+---
+### What is state?
+
+"State is a representation of the current data of an application at a given point in time."
+---
+### What is state management?
+
+"State management is the process of managing the state of an application, including how data is stored, retrieved, and updated."
+
+State management refers to the techniques and tools used to manage the state of an application.
+
+
+---
+###State management in Angular
+
+Local state:
+  - Component level state
+  - Lives within the component (or in services that are linked to the component lifecycle)
+  - Can be managed using component properties and methods
+  - Is invalidated when the component is destroyed
+
+Global state:
+  - Application level state
+  - Lives outside of components (In services, closes, or state management libraries)
+  - Can be managed using services, state management libraries, or other techniques
+  - Is invalidated when the application is destroyed or when the developer explicitly clears it
+
+---
+
+### Techniques and tools
+
+For small state:
+  - properties
+  - signals
+  - observables
+
+For large state:
+  - services
+  - state management libraries (e.g., NgRx, Akita, NGXS)
+
+
+---
+### NgRx
+
+3 flavors:
+  - redux store ( global state management based on the Redux pattern; uses actions, reducers, and selectors to manage state)
+
+  - component store (local state management based on services; uses observables to manage state, gives a lot of functions out of the box to reduce boilerplate code)
+
+  - signal store (local state management based on signals; uses signals to manage state, all functions of the component store are available, but uses signals instead of observables, lightweight alternative to the component store)
+
+
+---
+
+### Signal store
+
+install  the package:
+
+```npm
+
+npm install @ngrx/signals --save
+```
+
+
+Documentation: https://ngrx.io/guide/signals
+
+
+---
+
+### Signal store
+
+.strong[How to create a signal store?]
+
+
+
+
+    </textarea>
+<script src="../src/remark-latest.min.js">
+</script>
+<script>
+    var slideshow = remark.create({
+        ratio: '16:9'
+    });
+</script>
+</body>
+</html>
