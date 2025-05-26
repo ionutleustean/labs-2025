@@ -270,7 +270,20 @@ function makePredicate(field, op, rawValue) {
   };
 }
 
+app.get('/api/rating', (req, res) => {
+  const rating=  [
+    {id: 'burger_5_1', type: 'burger', rating: 2},
+    {id: 'burger_5_0', type: 'burger', rating: 3},
+    {id: 'pasta_1_0', type: 'pasta', rating: 4},
+    {id: 'pasta_0_1', type: 'pasta', rating: 5},
+    {id: 'pizza_1_0', type: 'pizza', rating: 5},
+    {id: 'pizza_0_2', type: 'pizza', rating: 3},
+    {id: 'pizza_0_0', type: 'pizza', rating: 5}
 
+  ]
+
+  res.json(rating);
+})
 
 
 

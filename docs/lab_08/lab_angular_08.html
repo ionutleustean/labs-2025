@@ -89,6 +89,80 @@ Documentation: https://ngrx.io/guide/signals
 .strong[How to create a signal store?]
 
 
+```typescript
+export const myStore = signalStore()
+```
+
+.red[*] But it need at least on param
+
+---
+
+### Params
+
+
+.small[
+withState
+```typescript
+withState({
+    loading: false,
+    items: [] as ItemModel[],
+    ...
+}
+```
+
+withComputed
+```typescript
+withComputed(({ books, filter }) => ({
+    booksCount: computed(() => books().length),
+    ...
+}
+```
+
+withMethods
+```typescript
+  withMethods((store) => ({
+    updateQuery(query: string): void {
+      // 👇 Updating state using the `patchState` function.
+      patchState(store, (state) => ({ filter: { ...state.filter, query } }));
+    },
+   ...
+}))
+
+```
+
+
+    withHooks, [customFeatureStores]
+
+]
+
+---
+
+.red[Ex.1] Using the store. Fetch all pizzas and display them as products
+
+---
+
+.red[Ex.2] Fetch all burgers and pasta and display them as products along with the pizzas
+
+---
+
+.red[Ex.3]
+  - Add filter state in the store.
+  - Refactor getAllPizzas to use rxMethods
+  - Refactor to use "witHooks" to start listening to filter change
+
+---
+.red[Ex.4] Refacto getAllBurgers and getAllPastas to work similar to getAllPizzas
+
+---
+
+.red[ex.5] Add sorting data to the store.
+    update the "products" computed functionality to sort the data according to the sorting state.
+
+You can use createSorter from utils.sort.ts
+
+---
+
+.red[ex.6] Using '/api/rating' update the products rating in the store. Doing so the we can observe the changes when we sort for rating.
 
 
     </textarea>
