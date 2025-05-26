@@ -11,7 +11,7 @@ export class BurgerResourceService {
 
   httpClient = inject(HttpClient);
 
-  getAllBurgers(filters: ProductFilter) {
+  getAllBurgers(filters?: ProductFilter) {
 
     const filtersParams = filters ? buildQueryParams(filters) : '';
 

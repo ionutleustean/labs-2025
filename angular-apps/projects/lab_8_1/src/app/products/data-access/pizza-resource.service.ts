@@ -13,7 +13,7 @@ export class PizzaResourceService {
   httpClient = inject(HttpClient);
 
 
-  private getAllPizzas(filters? : ProductFilter) {
+  getAllPizzas(filters? : ProductFilter) {
     const filtersParams = filters ? buildQueryParams(filters) : '';
 
     return this.httpClient.get<PizzaModel[]>('http://localhost:3000/api/filtered_pizza' + filtersParams)

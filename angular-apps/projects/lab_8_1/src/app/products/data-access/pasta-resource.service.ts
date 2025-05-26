@@ -11,7 +11,7 @@ export class PastaResourceService {
 
   httpClient = inject(HttpClient);
 
-  getAllPastas(filter: ProductFilter) {
+  getAllPastas(filter?: ProductFilter) {
     const filtersParams = filter ? buildQueryParams(filter) : '';
 
     return this.httpClient.get<any[]>('http://localhost:3000/api/filtered_pasta' + filtersParams);
