@@ -1,26 +1,25 @@
-import {Component, inject, signal} from '@angular/core';
+import {Component, effect, inject, signal} from '@angular/core';
 import {SortComponent, SortConfig} from './sort/sort.component';
 import {FiltersComponent} from './filters/filters.component';
 import {ProductFilter} from '../domain/product-filters.model';
 import {SortOption} from '../domain/product-sort.model';
-import {ProductModel} from '../domain/product.model';
 import {ProductCardComponent} from './product-card/product-card.component';
-import {productStore} from './+store/products-store';
+import {featureProductListStore} from './+store/feature-product-list.store';
+import {JsonPipe} from '@angular/common';
 
 @Component({
   selector: 'app-feature-product-list',
   imports: [
     SortComponent,
     FiltersComponent,
-    ProductCardComponent
+    ProductCardComponent,
   ],
   templateUrl: './feature-product-list.component.html',
   styleUrl: './feature-product-list.component.scss',
-  providers: [productStore]
+  providers:[featureProductListStore]
+
 })
 export class FeatureProductListComponent {
-  store = inject(productStore);
-
   sortFields = signal<SortOption[]>([
     {
       value: 'name',
@@ -36,18 +35,20 @@ export class FeatureProductListComponent {
     }
   ]);
 
+  store = inject(featureProductListStore);
+
   products = this.store.products;
 
-
-  constructor() {
-    this.store.getAllPizzas();
-  }
-
   onSortChange(sortConfig: SortConfig) {
-    console.log(sortConfig)
+    this.store.updateSort(sortConfig)
   }
 
   onFilterChanged(event: ProductFilter) {
-    console.log(event)
+
+    this.store.updateFilters(event);
+  }
+
+  loadRating() {
+    this.store.loadRatings();
   }
 }
