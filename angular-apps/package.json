@@ -50,6 +50,8 @@
     "start_lab_8_1": "ng serve lab_8_1 --port=4245",
     "start_lab_8_1_completed": "ng serve lab_8_1_completed --port=4246",
     "start_lab_8_2": "ng serve lab_8_2 --port=4247",
+    "start_lab_8_3": "ng serve lab_8_3 --port=4249",
+
     "start_backend": "node server/server.js",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",

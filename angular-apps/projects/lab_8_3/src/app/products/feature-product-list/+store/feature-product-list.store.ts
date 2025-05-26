@@ -1,13 +1,15 @@
-import {patchState, signalStore, withComputed, withMethods, withState} from '@ngrx/signals';
+import {patchState, signalStore, withComputed, withHooks, withMethods, withState} from '@ngrx/signals';
 import {PizzaModel} from '../../../pizzas/domain/pizza.model';
 import {BurgerModel} from '../../domain/burger.model';
 import {ProductModel} from '../../domain/product.model';
 import {computed, inject} from '@angular/core';
 import {PizzaResourceService} from '../../data-access/pizza-resource.service';
-import {tap} from 'rxjs';
+import {debounceTime, filter, pipe, switchMap, tap} from 'rxjs';
 import {PastaModel} from '../../domain/pasta.model';
 import {BurgerResourceService} from '../../data-access/burger-resource.service';
 import {PastaResourceService} from '../../data-access/pasta-resource.service';
+import {ProductFilter} from '../../domain/product-filters.model';
+import {rxMethod} from '@ngrx/signals/rxjs-interop';
 
 
 export const featureProductListStore = signalStore(
@@ -16,6 +18,7 @@ export const featureProductListStore = signalStore(
     pizzas: [] as PizzaModel[],
     burgers: [] as BurgerModel[],
     pasta: [] as PastaModel[],
+    filters: undefined as ProductFilter | undefined
   }),
 
   withComputed((state) => ({
@@ -68,19 +71,23 @@ export const featureProductListStore = signalStore(
   })),
 
   withMethods((state, pizzaService = inject(PizzaResourceService), burgerService = inject(BurgerResourceService), pastaService = inject(PastaResourceService)) => ({
-    loadPizzas: () => {
-      patchState(state, {loading: state.loading() + 1});
-      pizzaService.getAllPizzas()
-        .pipe(
-          tap(data => {
-            patchState(state, {
-              loading: state.loading() - 1,
-              pizzas: data
-            })
-          })
-        )
-        .subscribe()
-    },
+
+
+
+    loadPizzas: rxMethod<ProductFilter | undefined>($filter => $filter.pipe(
+      debounceTime(300),
+      tap(() => patchState(state, {loading: state.loading() + 1})),
+      switchMap((filter) => pizzaService.getAllPizzas(filter)),
+      tap(data => {
+        patchState(state, {
+          loading: state.loading() - 1,
+          pizzas: data
+        })
+      })
+    )),
+
+
+
 
     loadBurgers: () => {
       patchState(state, {loading: state.loading() + 1});
@@ -107,6 +114,14 @@ export const featureProductListStore = signalStore(
           })
         )
         .subscribe()
+    },
+    updateFilters: (filters: ProductFilter) => {
+      patchState(state, {filters: filters})
     }
-  }))
+  })),
+  withHooks({
+    onInit: (state) => {
+      state.loadPizzas(state.filters);
+    }
+  })
 )

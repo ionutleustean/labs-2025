@@ -14,7 +14,7 @@ export class PizzaResourceService {
 
 
    getAllPizzas(filters? : ProductFilter) {
-    const filtersParams = filters ? buildQueryParams(filters) : '';
+    const filtersParams = filters ? buildQueryParams(filters) : ''; // ?name[like]=value&price[eq]=12
 
     return this.httpClient.get<PizzaModel[]>('http://localhost:3000/api/filtered_pizza' + filtersParams)
   }

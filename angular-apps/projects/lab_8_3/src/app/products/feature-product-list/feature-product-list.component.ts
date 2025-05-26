@@ -40,7 +40,6 @@ export class FeatureProductListComponent {
 
 
   constructor() {
-    this.store.loadPizzas();
     this.store.loadBurgers();
     this.store.loadPastas();
   }
@@ -51,6 +50,6 @@ export class FeatureProductListComponent {
   }
 
   onFilterChanged(event: ProductFilter) {
-    console.log(event)
+    this.store.updateFilters(event);
   }
 }
