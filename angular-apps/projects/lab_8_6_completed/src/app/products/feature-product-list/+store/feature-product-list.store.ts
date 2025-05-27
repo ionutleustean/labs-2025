@@ -75,7 +75,7 @@ export const featureProductListStore = signalStore(
         .map(product => {
           return {
             ...product,
-            rating: state.ratings()[product.id]
+            rating: state.ratings()[product.id] || 0
           }
         })
         .sort(createSorter(state.sortConfig()))
@@ -144,7 +144,7 @@ export const featureProductListStore = signalStore(
     ),
     loadRatings: () => {
       rating.getRating().pipe(tap(ratings  => {
-        patchState(state, {ratings: (<any[]>ratings).reduce((acc, rating) => ({[rating.id]: rating.rating  }))
+        patchState(state, {ratings: (<any[]>ratings).reduce((acc, rating) => ({ ...acc, [rating.id]: rating.rating  }))
       })})).subscribe()
     },
     updateFilters: (filters: ProductFilter) => {

@@ -54,6 +54,7 @@
     "start_lab_8_4": "ng serve lab_8_3 --port=4251",
     "start_lab_8_5": "ng serve lab_8_5 --port=4253",
     "start_lab_8_6": "ng serve lab_8_6 --port=4255",
+    "start_lab_8_6_completed": "ng serve lab_8_6_completed --port=4256",
 
 
     "start_backend": "node server/server.js",

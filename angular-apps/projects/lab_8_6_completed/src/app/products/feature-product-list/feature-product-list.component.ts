@@ -13,6 +13,7 @@ import {JsonPipe} from '@angular/common';
     SortComponent,
     FiltersComponent,
     ProductCardComponent,
+    JsonPipe,
   ],
   templateUrl: './feature-product-list.component.html',
   styleUrl: './feature-product-list.component.scss',
@@ -36,6 +37,7 @@ export class FeatureProductListComponent {
   ]);
 
   store = inject(featureProductListStore);
+
 
   products = this.store.products;
 
